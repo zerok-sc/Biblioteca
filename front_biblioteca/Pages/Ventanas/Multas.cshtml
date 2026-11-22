@@ -18,6 +18,7 @@
     {
         <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
     }
+    <a class="boton boton-claro" asp-page-handler="Exportar">Exportar Excel (CSV)</a>
 </form>
 
 @if (Model.MostrarFormulario)
@@ -34,7 +35,7 @@
             </div>
             <div>
                 <label>Estado</label>
-                <select asp-for="Actual.estado" required asp-items="Model.Catalogos.OpcionesEstados">
+                <select asp-for="Actual.estado" required asp-items="Model.Catalogos.OpcionesEstadosMulta">
                 </select>
             </div>
         </div>
@@ -49,7 +50,10 @@
     <thead>
         <tr>
             <th>id</th>
+            <th>Usuario</th>
+            <th>Libro</th>
             <th>Valor</th>
+            <th>Días atraso</th>
             <th>Fecha</th>
             <th>Prestamo libro</th>
             <th>Estado</th>
@@ -61,19 +65,39 @@
         {
             <tr>
                 <td>@item.id</td>
-                <td>@item.valor</td>
-                <td>@item.fecha</td>
+                <td>@Model.NombrePersona(item)</td>
+                <td>@Model.NombreLibro(item)</td>
+                <td>@item.valor.ToString("N0")</td>
+                <td>@Model.DiasAtraso(item)</td>
+                <td>@item.fecha.ToString("dd/MM/yyyy")</td>
                 <td>@Model.Catalogos.NombrePrestamoLibro(item.prestamo_libro)</td>
                 <td>@Model.Catalogos.NombreEstado(item.estado)</td>
                 <td>
-                    <form method="post" style="display:inline">
-                        <input type="hidden" name="id" value="@item.id" />
+                    <div class="acciones">
+                        <a class="boton boton-claro" asp-page="/Comprobante"
+                           asp-route-tipo="multa" asp-route-id="@item.id">Factura / PDF</a>
+
                         @if (!User.IsInRole("LECTOR"))
                         {
-                            <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
-                            <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
+                            <form method="post" style="display:inline">
+                                <input type="hidden" name="id" value="@item.id" />
+                                <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
+                            </form>
+
+                            @if (!Model.EsPagada(item))
+                            {
+                                <form method="post" style="display:inline">
+                                    <input type="hidden" name="id" value="@item.id" />
+                                    <button class="boton" asp-page-handler="Pagar">Marcar pagada</button>
+                                </form>
+                            }
+
+                            <form method="post" style="display:inline">
+                                <input type="hidden" name="id" value="@item.id" />
+                                <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
+                            </form>
                         }
-                    </form>
+                    </div>
                 </td>
             </tr>
         }

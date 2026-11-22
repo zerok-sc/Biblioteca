@@ -11,6 +11,12 @@
     @await Html.PartialAsync("~/Pages/Emergentes/Mensajes.cshtml");
 }
 
+<ul class="tarjetas resumen">
+    <li>Préstamos activos <strong>@Model.PrestamosActivos</strong></li>
+    <li>Atrasados <strong>@Model.PrestamosAtrasados</strong></li>
+    <li>Ejemplares disponibles <strong>@Model.TotalEjemplaresDisponibles</strong></li>
+</ul>
+
 <form method="post" class="barra">
     <input type="text" name="BuscarNombre" value="@Model.BuscarNombre"
            placeholder="Buscar usuario por nombre o cédula" />
@@ -96,45 +102,176 @@
 
         <p class="ayuda">Si deja la fecha final vacía, se calcula con el tiempo indicado.</p>
 
+        <h3>Ejemplares disponibles</h3>
+        <p class="ayuda">Seleccione uno o varios ejemplares. Solo aparecen los que están disponibles.</p>
+
+        @if (Model.EjemplaresDisponibles.Count == 0)
+        {
+            <p class="error">No hay ejemplares disponibles. Registre un ejemplar nuevo o devuelva un préstamo.</p>
+        }
+        else
+        {
+            <div class="tabla-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Seleccionar</th>
+                            <th>id</th>
+                            <th>Código</th>
+                            <th>Libro</th>
+                            <th>Ubicación</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ejemplar in Model.EjemplaresDisponibles)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="EjemplaresSeleccionados"
+                                           value="@ejemplar.id"
+                                           checked="@Model.EjemplaresSeleccionados.Contains(ejemplar.id)" />
+                                </td>
+                                <td>@ejemplar.id</td>
+                                <td>@ejemplar.codigo</td>
+                                <td>@Model.Catalogos.NombreLibroDeEjemplar(ejemplar.id)</td>
+                                <td>@Model.Catalogos.NombreUbicacion(ejemplar.ubicacion)</td>
+                                <td>@Model.Catalogos.NombreEstado(ejemplar.estado)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <p class="ayuda">
+            Si el préstamo se devuelve después de la fecha final, se genera una multa
+            automática de 2.000 pesos por cada día de atraso.
+        </p>
+
         <button class="boton" asp-page-handler="CrearPrestamo">Registrar préstamo</button>
     </form>
 }
 
+@if (Model.PersonaSeleccionada > 0 && Model.PrestamosDePersona.Count > 0)
+{
+    <h3>Historial de @Model.NombrePersonaSeleccionada</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Código</th>
+                <th>Inicio</th>
+                <th>Final</th>
+                <th>Estado</th>
+                <th>Situación</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PrestamosDePersona)
+            {
+                <tr>
+                    <td>@item.id</td>
+                    <td>@item.codigo</td>
+                    <td>@item.fecha_inicio.ToString("dd/MM/yyyy")</td>
+                    <td>@item.fecha_fin.ToString("dd/MM/yyyy")</td>
+                    <td>@Model.EstadoVisible(item)</td>
+                    <td><span class="etiqueta @Model.ClaseSituacion(item)">@Model.Situacion(item)</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
 <h2>Préstamos registrados</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>id</th>
-            <th>Código</th>
-            <th>Usuario</th>
-            <th>Empleado</th>
-            <th>Inicio</th>
-            <th>Final</th>
-            <th>Tiempo</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Lista)
-        {
+<form method="post" class="barra">
+    <input type="text" name="BuscarPrestamo" value="@Model.BuscarPrestamo"
+           placeholder="Buscar por código o usuario" />
+    <select name="FiltroEstado">
+        <option value="todos" selected="@(Model.FiltroEstadoActual == "todos")">Todos</option>
+        <option value="activos" selected="@(Model.FiltroEstadoActual == "activos")">Activos</option>
+        <option value="atrasados" selected="@(Model.FiltroEstadoActual == "atrasados")">Atrasados</option>
+        <option value="devueltos" selected="@(Model.FiltroEstadoActual == "devueltos")">Devueltos</option>
+    </select>
+    <button class="boton" asp-page-handler="FiltrarPrestamos">Filtrar</button>
+    <a class="boton boton-claro" asp-page="/Ventanas/Prestamos">Limpiar</a>
+    <a class="boton boton-claro" asp-page-handler="Exportar"
+       asp-route-BuscarPrestamo="@Model.BuscarPrestamo"
+       asp-route-FiltroEstado="@Model.FiltroEstadoActual">Exportar Excel (CSV)</a>
+</form>
+
+@if (Model.PrestamosFiltrados.Count == 0)
+{
+    <p class="ayuda">No hay préstamos que coincidan con el filtro.</p>
+}
+else
+{
+    <table>
+        <thead>
             <tr>
-                <td>@item.id</td>
-                <td>@item.codigo</td>
-                <td>@Model.NombrePersona(item.persona)</td>
-                <td>@Model.NombreEmpleado(item.empleado)</td>
-                <td>@item.fecha_inicio.ToString("dd/MM/yyyy")</td>
-                <td>@item.fecha_fin.ToString("dd/MM/yyyy")</td>
-                <td>@item.tiempo días</td>
-                <td>@Model.NombreEstado(item.estado)</td>
-                <td>
-                    <form method="post" style="display:inline">
-                        <input type="hidden" name="id" value="@item.id" />
-                        <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
-                    </form>
-                </td>
+                <th>id</th>
+                <th>Código</th>
+                <th>Usuario</th>
+                <th>Empleado</th>
+                <th>Ejemplares</th>
+                <th>Inicio</th>
+                <th>Final</th>
+                <th>Tiempo</th>
+                <th>Estado</th>
+                <th>Situación</th>
+                <th>Acciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PrestamosFiltrados)
+            {
+                <tr>
+                    <td>@item.id</td>
+                    <td>@item.codigo</td>
+                    <td>@Model.NombrePersona(item.persona)</td>
+                    <td>@Model.NombreEmpleado(item.empleado)</td>
+                    <td>@Model.Catalogos.EjemplaresDePrestamo(item.id)</td>
+                    <td>@item.fecha_inicio.ToString("dd/MM/yyyy")</td>
+                    <td>@item.fecha_fin.ToString("dd/MM/yyyy")</td>
+                    <td>@item.tiempo días</td>
+                    <td>@Model.EstadoVisible(item)</td>
+                    <td><span class="etiqueta @Model.ClaseSituacion(item)">@Model.Situacion(item)</span></td>
+                    <td>
+                        <div class="acciones">
+                            <a class="boton boton-claro" asp-page="/Comprobante"
+                               asp-route-tipo="prestamo" asp-route-id="@item.id">Comprobante</a>
+
+                            @if (Model.Catalogos.PrestamoActivo(item))
+                            {
+                                <form method="post" style="display:inline">
+                                    <input type="hidden" name="id" value="@item.id" />
+                                    <input type="hidden" name="FiltroEstado" value="@Model.FiltroEstadoActual" />
+                                    <input type="hidden" name="BuscarPrestamo" value="@Model.BuscarPrestamo" />
+                                    <button class="boton" asp-page-handler="Devolver">Devolver</button>
+                                </form>
+
+                                @if (!Model.Catalogos.PrestamoAtrasado(item))
+                                {
+                                    <form method="post" style="display:inline">
+                                        <input type="hidden" name="id" value="@item.id" />
+                                        <input type="hidden" name="FiltroEstado" value="@Model.FiltroEstadoActual" />
+                                        <input type="hidden" name="BuscarPrestamo" value="@Model.BuscarPrestamo" />
+                                        <button class="boton boton-claro" asp-page-handler="Renovar">Renovar 15 días</button>
+                                    </form>
+                                }
+                            }
+
+                            <form method="post" style="display:inline">
+                                <input type="hidden" name="id" value="@item.id" />
+                                <input type="hidden" name="FiltroEstado" value="@Model.FiltroEstadoActual" />
+                                <input type="hidden" name="BuscarPrestamo" value="@Model.BuscarPrestamo" />
+                                <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

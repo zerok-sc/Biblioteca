@@ -1,0 +1,138 @@
+@page
+@model ComprobanteModel
+@{
+    ViewData["Title"] = "Comprobante";
+}
+
+<div class="no-imprimir barra">
+    <button class="boton" onclick="window.print()">Imprimir / Guardar PDF</button>
+    <a class="boton boton-claro" asp-page="/Index">Volver al inicio</a>
+</div>
+
+@if (Model.Tipo == "prestamo" && Model.Prestamo is not null)
+{
+    var prestamo = Model.Prestamo;
+
+    <article class="comprobante">
+        <header class="comprobante-cabecera">
+            <div>
+                <h1>Biblioteca ITM</h1>
+                <p>Comprobante de préstamo</p>
+            </div>
+            <div class="comprobante-numero">
+                <strong>@prestamo.codigo</strong>
+                <span>id @prestamo.id</span>
+            </div>
+        </header>
+
+        <section class="comprobante-datos">
+            <div><span>Usuario</span><strong>@Model.NombrePersona(prestamo.persona)</strong></div>
+            <div><span>Empleado</span><strong>@Model.NombreEmpleado(prestamo.empleado)</strong></div>
+            <div><span>Fecha de inicio</span><strong>@prestamo.fecha_inicio.ToString("dd/MM/yyyy")</strong></div>
+            <div><span>Fecha final</span><strong>@prestamo.fecha_fin.ToString("dd/MM/yyyy")</strong></div>
+            <div><span>Tiempo</span><strong>@prestamo.tiempo días</strong></div>
+            <div><span>Estado</span><strong>@Model.NombreEstado(prestamo.estado)</strong></div>
+            <div><span>Situación</span><strong>@Model.Situacion(prestamo)</strong></div>
+        </section>
+
+        <h2>Ejemplares prestados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Código</th>
+                    <th>Libro</th>
+                    <th>Ubicación</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detalle in Model.Detalles)
+                {
+                    <tr>
+                        <td>@detalle.id</td>
+                        <td>@Model.Catalogos.NombreEjemplar(detalle.ejemplar)</td>
+                        <td>@Model.NombreLibroDeEjemplar(detalle.ejemplar)</td>
+                        <td>@Model.NombreUbicacionDeEjemplar(detalle.ejemplar)</td>
+                        <td>@Model.NombreEstado(detalle.estado)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (Model.MultasPrestamo.Count > 0)
+        {
+            <h2>Multas asociadas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>Valor</th>
+                        <th>Días atraso</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var multa in Model.MultasPrestamo)
+                    {
+                        <tr>
+                            <td>@multa.id</td>
+                            <td>@multa.valor.ToString("N0")</td>
+                            <td>@Model.DiasAtraso(multa)</td>
+                            <td>@multa.fecha.ToString("dd/MM/yyyy")</td>
+                            <td>@Model.NombreEstado(multa.estado)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="comprobante-total">Total multas: <strong>$ @Model.TotalMultas.ToString("N0")</strong></p>
+        }
+
+        <footer class="comprobante-pie">
+            <p>Recuerde devolver los ejemplares en la fecha indicada. Si hay atraso, se genera una multa de 2.000 pesos por día.</p>
+            <div class="comprobante-firmas">
+                <span>Firma del usuario</span>
+                <span>Firma del bibliotecario</span>
+            </div>
+        </footer>
+    </article>
+}
+else if (Model.Tipo == "multa" && Model.Multa is not null)
+{
+    var multa = Model.Multa;
+
+    <article class="comprobante">
+        <header class="comprobante-cabecera">
+            <div>
+                <h1>Biblioteca ITM</h1>
+                <p>Factura de multa</p>
+            </div>
+            <div class="comprobante-numero">
+                <strong>Multa #@multa.id</strong>
+                <span>@multa.fecha.ToString("dd/MM/yyyy")</span>
+            </div>
+        </header>
+
+        <section class="comprobante-datos">
+            <div><span>Usuario</span><strong>@Model.NombrePersonaMulta(multa)</strong></div>
+            <div><span>Libro</span><strong>@Model.NombreLibroMulta(multa)</strong></div>
+            <div><span>Préstamo libro</span><strong>@Model.Catalogos.NombrePrestamoLibro(multa.prestamo_libro)</strong></div>
+            <div><span>Días de atraso</span><strong>@Model.DiasAtraso(multa)</strong></div>
+            <div><span>Valor</span><strong>$ @multa.valor.ToString("N0")</strong></div>
+            <div><span>Estado</span><strong>@Model.NombreEstado(multa.estado)</strong></div>
+        </section>
+
+        <footer class="comprobante-pie">
+            <p>Este documento relaciona la multa con el usuario y el libro correspondiente.</p>
+            <div class="comprobante-firmas">
+                <span>Firma del usuario</span>
+                <span>Firma del bibliotecario</span>
+            </div>
+        </footer>
+    </article>
+}
+else
+{
+    <p class="error">No se encontró el comprobante solicitado.</p>
+}

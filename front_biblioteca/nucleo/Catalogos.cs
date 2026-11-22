@@ -23,6 +23,7 @@ namespace front_biblioteca.nucleo
         private readonly IPresentacion<Usuarios> usuarios;
         private readonly IPresentacion<Prestamos> prestamos;
         private readonly IPresentacion<Prestamos_Libros> prestamosLibros;
+        private readonly IPresentacion<Multas> multas;
 
         public List<Personas> ListaPersonas { get; private set; } = new();
         public List<Empleados> ListaEmpleados { get; private set; } = new();
@@ -41,6 +42,7 @@ namespace front_biblioteca.nucleo
         public List<Usuarios> ListaUsuarios { get; private set; } = new();
         public List<Prestamos> ListaPrestamos { get; private set; } = new();
         public List<Prestamos_Libros> ListaPrestamosLibros { get; private set; } = new();
+        public List<Multas> ListaMultas { get; private set; } = new();
 
         private bool cargado;
 
@@ -61,7 +63,8 @@ namespace front_biblioteca.nucleo
             IPresentacion<Roles> roles,
             IPresentacion<Usuarios> usuarios,
             IPresentacion<Prestamos> prestamos,
-            IPresentacion<Prestamos_Libros> prestamosLibros)
+            IPresentacion<Prestamos_Libros> prestamosLibros,
+            IPresentacion<Multas> multas)
         {
             this.personas = personas;
             this.empleados = empleados;
@@ -80,6 +83,7 @@ namespace front_biblioteca.nucleo
             this.usuarios = usuarios;
             this.prestamos = prestamos;
             this.prestamosLibros = prestamosLibros;
+            this.multas = multas;
         }
 
         public async Task CargarAsync()
@@ -105,11 +109,18 @@ namespace front_biblioteca.nucleo
                 CargarRoles(),
                 CargarUsuarios(),
                 CargarPrestamos(),
-                CargarPrestamosLibros()
+                CargarPrestamosLibros(),
+                CargarMultas()
             };
 
             await Task.WhenAll(tareas);
             cargado = true;
+        }
+
+        public async Task RecargarAsync()
+        {
+            cargado = false;
+            await CargarAsync();
         }
 
         private async Task CargarPersonas() => ListaPersonas = await personas.Consultar();
@@ -129,6 +140,7 @@ namespace front_biblioteca.nucleo
         private async Task CargarUsuarios() => ListaUsuarios = await usuarios.Consultar();
         private async Task CargarPrestamos() => ListaPrestamos = await prestamos.Consultar();
         private async Task CargarPrestamosLibros() => ListaPrestamosLibros = await prestamosLibros.Consultar();
+        private async Task CargarMultas() => ListaMultas = await multas.Consultar();
 
         public string NombrePersona(int id) =>
             id == 0 ? "No asignado" : ListaPersonas.FirstOrDefault(x => x.id == id)?.nombre ?? "No asignado";
@@ -146,6 +158,27 @@ namespace front_biblioteca.nucleo
 
         public string NombreEstado(int id) =>
             id == 0 ? "No asignado" : ListaEstados.FirstOrDefault(x => x.id == id)?.nombre ?? "No asignado";
+
+        public string CodigoEstado(int id) =>
+            ListaEstados.FirstOrDefault(x => x.id == id)?.codigo ?? "";
+
+        public int IdEstado(string codigo) =>
+            ListaEstados.FirstOrDefault(x => x.codigo == codigo)?.id ?? 0;
+
+        public bool EstadoEsActivo(int id) =>
+            CodigoEstado(id) is "PRE" or "ATR";
+
+        public bool PrestamoActivo(Prestamos prestamo) =>
+            EstadoEsActivo(prestamo.estado);
+
+        public bool PrestamoAtrasado(Prestamos prestamo) =>
+            PrestamoActivo(prestamo) && prestamo.fecha_fin.Date < DateTime.Today;
+
+        public int DiasAtraso(Prestamos prestamo) =>
+            Math.Max(0, (DateTime.Today - prestamo.fecha_fin.Date).Days);
+
+        public int DiasRestantes(Prestamos prestamo) =>
+            (prestamo.fecha_fin.Date - DateTime.Today).Days;
 
         public string NombreEditorial(int id) =>
             id == 0 ? "No asignado" : ListaEditoriales.FirstOrDefault(x => x.id == id)?.nombre ?? "No asignado";
@@ -209,6 +242,56 @@ namespace front_biblioteca.nucleo
                 : $"{NombrePrestamo(prestamoLibro.prestamo)} / {NombreEjemplar(prestamoLibro.ejemplar)}";
         }
 
+        public string NombreLibroDeEjemplar(int ejemplarId)
+        {
+            var ejemplar = ListaEjemplares.FirstOrDefault(x => x.id == ejemplarId);
+            return ejemplar is null ? "No asignado" : NombreLibro(ejemplar.libro);
+        }
+
+        public List<Prestamos_Libros> PrestamosLibrosDe(int prestamoId) =>
+            ListaPrestamosLibros
+                .Where(x => x.prestamo == prestamoId)
+                .OrderBy(x => x.id)
+                .ToList();
+
+        public string EjemplaresDePrestamo(int prestamoId)
+        {
+            var ejemplares = PrestamosLibrosDe(prestamoId)
+                .Select(x => NombreEjemplar(x.ejemplar))
+                .ToList();
+
+            return ejemplares.Count == 0 ? "Sin ejemplares" : string.Join(", ", ejemplares);
+        }
+
+        public int CantidadEjemplaresDePrestamo(int prestamoId) =>
+            PrestamosLibrosDe(prestamoId).Count;
+
+        public string NombrePersonaDePrestamoLibro(int prestamoLibroId)
+        {
+            var prestamoLibro = ListaPrestamosLibros.FirstOrDefault(x => x.id == prestamoLibroId);
+            if (prestamoLibro is null)
+                return "No asignado";
+
+            var prestamo = ListaPrestamos.FirstOrDefault(x => x.id == prestamoLibro.prestamo);
+            return prestamo is null ? "No asignado" : NombrePersona(prestamo.persona);
+        }
+
+        public string NombreLibroDePrestamoLibro(int prestamoLibroId)
+        {
+            var prestamoLibro = ListaPrestamosLibros.FirstOrDefault(x => x.id == prestamoLibroId);
+            return prestamoLibro is null ? "No asignado" : NombreLibroDeEjemplar(prestamoLibro.ejemplar);
+        }
+
+        public int DiasAtrasoDePrestamoLibro(int prestamoLibroId)
+        {
+            var prestamoLibro = ListaPrestamosLibros.FirstOrDefault(x => x.id == prestamoLibroId);
+            if (prestamoLibro is null)
+                return 0;
+
+            var prestamo = ListaPrestamos.FirstOrDefault(x => x.id == prestamoLibro.prestamo);
+            return prestamo is null ? 0 : DiasAtraso(prestamo);
+        }
+
         public List<SelectListItem> OpcionesPersonas =>
             ConVacio(ListaPersonas.Select(x => new SelectListItem(
                 $"{x.nombre} ({x.cedula})", x.id.ToString())));
@@ -217,7 +300,14 @@ namespace front_biblioteca.nucleo
             ConVacio(ListaEmpleados.Select(x => new SelectListItem(NombreEmpleado(x.id), x.id.ToString())));
 
         public List<SelectListItem> OpcionesEstados =>
-            ConVacio(ListaEstados.Select(x => new SelectListItem(x.nombre, x.id.ToString())));
+            ConVacio(ListaEstados
+                .Where(x => x.codigo != "PAG")
+                .Select(x => new SelectListItem(x.nombre, x.id.ToString())));
+
+        public List<SelectListItem> OpcionesEstadosMulta =>
+            ConVacio(ListaEstados
+                .Where(x => x.codigo is "ACT" or "INA" or "PAG")
+                .Select(x => new SelectListItem(x.nombre, x.id.ToString())));
 
         public List<SelectListItem> OpcionesEditoriales =>
             ConVacio(ListaEditoriales.Select(x => new SelectListItem(x.nombre, x.id.ToString())));

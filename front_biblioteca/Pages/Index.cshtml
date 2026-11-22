@@ -12,13 +12,131 @@
     @await Html.PartialAsync("~/Pages/Emergentes/Mensajes.cshtml");
 }
 
-<ul class="tarjetas resumen">
-    <li>Libros: <strong>@Model.TotalLibros</strong></li>
-    <li>Autores: <strong>@Model.TotalAutores</strong></li>
-    <li>Préstamos: <strong>@Model.TotalPrestamos</strong></li>
-    <li>Usuarios: <strong>@Model.TotalUsuarios</strong></li>
-</ul>
+@if (Model.EsOperador)
+{
+    <h2>Resumen operativo</h2>
+    <ul class="tarjetas resumen">
+        <li>Préstamos activos <strong>@Model.PrestamosActivos</strong></li>
+        <li>Atrasados <strong>@Model.PrestamosAtrasados</strong></li>
+        <li>Por vencer (3 días) <strong>@Model.PrestamosPorVencer</strong></li>
+        <li>Ejemplares disponibles <strong>@Model.EjemplaresDisponibles</strong></li>
+        <li>Multas pendientes <strong>@Model.MultasPendientes</strong></li>
+        <li>Valor multas <strong>$ @Model.ValorMultasPendientes.ToString("N0")</strong></li>
+    </ul>
 
+    <p>
+        <a class="boton" asp-page="/Ventanas/Prestamos">Registrar préstamo</a>
+        <a class="boton boton-claro" asp-page="/Ventanas/Multas">Ver multas</a>
+        @if (User.IsInRole("ADMIN"))
+        {
+            <a class="boton boton-claro" asp-page="/CrearUsuario">Crear usuario</a>
+        }
+    </p>
+
+    @if (Model.Atrasados.Count > 0)
+    {
+        <h2>Préstamos atrasados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Usuario</th>
+                    <th>Ejemplares</th>
+                    <th>Fecha final</th>
+                    <th>Atraso</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Atrasados)
+                {
+                    <tr>
+                        <td>@item.id</td>
+                        <td>@Model.NombrePersona(item.persona)</td>
+                        <td>@Model.Ejemplares(item)</td>
+                        <td>@item.fecha_fin.ToString("dd/MM/yyyy")</td>
+                        <td><span class="etiqueta etiqueta-atrasado">@Model.Situacion(item)</span></td>
+                        <td>
+                            <a class="boton boton-claro" asp-page="/Comprobante"
+                               asp-route-tipo="prestamo" asp-route-id="@item.id">Comprobante</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="aviso">No hay préstamos atrasados.</p>
+    }
+
+    @if (Model.PorVencer.Count > 0)
+    {
+        <h2>Próximos vencimientos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Usuario</th>
+                    <th>Ejemplares</th>
+                    <th>Fecha final</th>
+                    <th>Situación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.PorVencer)
+                {
+                    <tr>
+                        <td>@item.id</td>
+                        <td>@Model.NombrePersona(item.persona)</td>
+                        <td>@Model.Ejemplares(item)</td>
+                        <td>@item.fecha_fin.ToString("dd/MM/yyyy")</td>
+                        <td><span class="etiqueta @Model.ClaseSituacion(item)">@Model.Situacion(item)</span></td>
+                        <td>
+                            <a class="boton boton-claro" asp-page="/Comprobante"
+                               asp-route-tipo="prestamo" asp-route-id="@item.id">Comprobante</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @if (Model.LibrosMasPrestados.Count > 0)
+    {
+        <h2>Libros más prestados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Libro</th>
+                    <th>Préstamos</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.LibrosMasPrestados)
+                {
+                    <tr>
+                        <td>@item.id</td>
+                        <td>@item.Nombre</td>
+                        <td>@item.Veces</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+else
+{
+    <ul class="tarjetas resumen">
+        <li>Libros <strong>@Model.TotalLibros</strong></li>
+        <li>Autores <strong>@Model.TotalAutores</strong></li>
+        <li>Ejemplares disponibles <strong>@Model.EjemplaresDisponibles</strong></li>
+    </ul>
+}
+
+<h2>Módulos</h2>
 <p>Seleccione una entidad para administrar sus registros.</p>
 <ul class="tarjetas">
         @if (Model.PuedeVer("Auditorias"))

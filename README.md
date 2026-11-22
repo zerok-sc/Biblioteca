@@ -140,13 +140,74 @@ préstamo:
 
 1. Buscan al usuario por nombre o cédula.
 2. Pulsan **Seleccionar**.
-3. Indican tiempo en días, fecha de inicio, fecha final, estado y empleado.
-4. Pulsan **Registrar préstamo**.
+3. Eligen uno o varios ejemplares disponibles de la lista.
+4. Indican tiempo en días, fecha de inicio, fecha final, estado y empleado.
+5. Pulsan **Registrar préstamo**.
 
 El código se genera automáticamente. Si la fecha final se deja vacía, se calcula
 con la fecha de inicio y el tiempo. La tabla `Prestamos` guarda `tiempo`,
 `fecha_inicio`, `fecha_fin` y `estado` (llave foránea a `Estados`), además de la
-persona y el empleado. El rol LECTOR no puede entrar a esta página.
+persona y el empleado. Cada ejemplar se guarda en `Prestamos_Libros` y la copia
+pasa al estado `PRE` (Prestado). Antes de guardar se valida que todas las copias
+sigan disponibles. El rol LECTOR no puede entrar a esta página.
+
+La ventana muestra el resumen de préstamos activos, atrasados y disponibles, el
+historial del usuario seleccionado, filtros por texto y estado, y las acciones
+**Devolver**, **Renovar** y **Comprobante**.
+
+## Devoluciones, renovaciones y multas
+
+- **Devolver** marca el encabezado y sus detalles como `DEV` (Devuelto) y las
+  copias vuelven a `DIS` (Disponible).
+- Si el préstamo está atrasado, al devolver se crea una multa por cada detalle
+  atrasado: **2.000 pesos por día de atraso**. No se duplica una multa que ya
+  exista para ese `Prestamos_Libros`.
+- **Renovar** amplía la fecha final en 15 días, aumenta el tiempo y actualiza los
+  detalles. No se permite renovar un préstamo atrasado; primero debe devolverse.
+- En `Pages/Ventanas/Multas.cshtml` se ve el usuario, el libro, los días de
+  atraso, el valor y el estado. El botón **Pagar** cambia la multa al estado
+  `PAG` (Pagada). Los estados disponibles para multas son `ACT`, `INA` y `PAG`.
+
+## Tablero
+
+`Pages/Index.cshtml` funciona como tablero para ADMIN y BIBLIO: préstamos activos,
+atrasados, próximos vencimientos (3 días), ejemplares disponibles, multas
+pendientes, valor total de multas, libros más prestados y accesos rápidos a
+préstamos, multas y creación de usuarios. El rol LECTOR solo ve los totales del
+catálogo y los ejemplares disponibles.
+
+## Exportaciones y comprobantes
+
+- **Exportar Excel (CSV)** descarga un archivo UTF-8 con BOM y separador `;`, que
+  Excel abre directamente. Está disponible en Préstamos (respeta los filtros) y
+  en Multas.
+- **Comprobante** abre una vista imprimible del préstamo con sus ejemplares y
+  multas asociadas. **Factura / PDF** hace lo mismo para una multa.
+- El botón **Imprimir / Guardar PDF** usa `window.print()` y el estilo
+  `@media print`, sin agregar una librería externa de PDF.
+
+Los datos de ejemplo dejan las copias `EJM-006`, `EJM-007` y `EJM-008`
+disponibles, y el préstamo `PRES-05` devuelto, para poder probar el ciclo
+completo sin modificar el esquema.
+
+## Orden recomendado para crear datos en una prueba
+
+Los formularios de alta siguen disponibles para ADMIN y BIBLIO en cada ventana
+(`Nuevo registro` → completar → `Guardar`). Para que las listas desplegables ya
+tengan opciones, conviene crear primero lo que no depende de nada y después lo
+que usa llaves foráneas:
+
+1. `Autores`, `Editoriales`, `Ubicaciones`, `Proveedores` y `Personas`.
+2. `Idiomas` y `Categorias` (piden un `Estado`, por ejemplo Activo).
+3. `Libros` (piden `Editorial` e `Idioma`).
+4. `Ejemplares` (piden `Estado`, `Libro` y `Ubicacion`).
+5. `Libros_Autores` y `Libros_Categorias` para relacionarlos.
+6. `Empleados`, `Prestamos` y `Prestamos_Libros`.
+
+El id queda siempre visible en la tabla y en el campo oculto del formulario; las
+llaves foráneas se eligen por nombre en el select. El rol LECTOR puede consultar
+estas ventanas, pero no ve los botones de alta y sus handlers rechazan cualquier
+intento de guardar, editar o borrar.
 
 ## Nombres en lugar de ids
 

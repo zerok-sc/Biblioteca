@@ -242,7 +242,8 @@ INSERT INTO [Estados] ([nombre], [codigo], [descripcion], [fecha_creacion]) VALU
 ('Disponible',    'DIS', 'El ejemplar está disponible para préstamo', GETDATE()),
 ('Mantenimiento', 'MAN', 'El ejemplar está en reparación',            GETDATE()),
 ('Devuelto',      'DEV', 'El préstamo ya fue devuelto',               GETDATE()),
-('Atrasado',      'ATR', 'El préstamo superó la fecha de entrega',    GETDATE());
+('Atrasado',      'ATR', 'El préstamo superó la fecha de entrega',    GETDATE()),
+('Pagada',        'PAG', 'La multa ya fue pagada',                    GETDATE());
 
 INSERT INTO [Roles] ([nombre], [codigo], [descripcion], [fecha_creacion]) VALUES
 ('Administrador', 'ADMIN',  'Acceso total al sistema',          GETDATE()),
@@ -363,11 +364,14 @@ INSERT INTO [Ubicaciones] ([codigo], [piso], [descripcion], [estanteria]) VALUES
 ('UBI-501', 0, 'Repisa baja del estante E', 5);
 
 INSERT INTO [Ejemplares] ([codigo], [estado], [libro], [ubicacion]) VALUES
-('EJM-001', 4, 1, 1),
-('EJM-002', 4, 2, 2),
+('EJM-001', 3, 1, 1),
+('EJM-002', 3, 2, 2),
 ('EJM-003', 3, 3, 3),
-('EJM-004', 4, 4, 4),
-('EJM-005', 5, 5, 5);
+('EJM-004', 3, 4, 4),
+('EJM-005', 5, 5, 5),
+('EJM-006', 4, 1, 1),
+('EJM-007', 4, 2, 2),
+('EJM-008', 4, 4, 4);
 
 INSERT INTO [Prestamos]
     ([codigo], [persona], [empleado], [fecha], [tiempo], [fecha_inicio], [fecha_fin], [estado])
@@ -376,14 +380,14 @@ VALUES
 ('PRES-02', 2, 2, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE')),
 ('PRES-03', 3, 1, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE')),
 ('PRES-04', 4, 3, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE')),
-('PRES-05', 5, 2, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE'));
+('PRES-05', 5, 2, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'DEV'));
 
 INSERT INTO [Prestamos_Libros] ([prestamo], [ejemplar], [estado], [fecha]) VALUES
 (1, 1, 3, DATEADD(DAY, 15, GETDATE())),
 (2, 2, 3, DATEADD(DAY, 15, GETDATE())),
 (3, 3, 3, DATEADD(DAY, 15, GETDATE())),
 (4, 4, 3, DATEADD(DAY, 15, GETDATE())),
-(5, 5, 3, DATEADD(DAY, 15, GETDATE()));
+(5, 5, (SELECT id FROM [Estados] WHERE codigo = 'DEV'), DATEADD(DAY, 15, GETDATE()));
 
 INSERT INTO [Multas] ([valor], [fecha], [prestamo_libro], [estado]) VALUES
 ( 5000.00, GETDATE(), 1, 1),
