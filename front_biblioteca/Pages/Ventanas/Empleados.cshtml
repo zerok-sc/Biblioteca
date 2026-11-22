@@ -43,6 +43,7 @@
 <table>
     <thead>
         <tr>
+            <th>id</th>
             <th>Persona</th>
             <th>Cargo</th>
             <th>Fecha contratacion</th>
@@ -53,6 +54,7 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
+                <td>@item.id</td>
                 <td>@Model.Catalogos.NombrePersona(item.persona)</td>
                 <td>@item.cargo</td>
                 <td>@item.fecha_contratacion</td>

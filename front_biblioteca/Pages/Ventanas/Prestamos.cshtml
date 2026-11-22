@@ -27,6 +27,7 @@
     <table>
         <thead>
             <tr>
+                <th>id</th>
                 <th>Nombre</th>
                 <th>Cédula</th>
                 <th>Teléfono</th>
@@ -37,6 +38,7 @@
             @foreach (var persona in Model.Coincidencias)
             {
                 <tr>
+                    <td>@persona.id</td>
                     <td>@persona.nombre</td>
                     <td>@persona.cedula</td>
                     <td>@persona.telefono</td>
@@ -103,6 +105,7 @@
 <table>
     <thead>
         <tr>
+            <th>id</th>
             <th>Código</th>
             <th>Usuario</th>
             <th>Empleado</th>
@@ -117,6 +120,7 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
+                <td>@item.id</td>
                 <td>@item.codigo</td>
                 <td>@Model.NombrePersona(item.persona)</td>
                 <td>@Model.NombreEmpleado(item.empleado)</td>

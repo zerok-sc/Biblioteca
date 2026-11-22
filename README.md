@@ -155,9 +155,10 @@ Las tablas muestran `NombreEditorial`, `NombreIdioma`, `NombrePersona`,
 `NombreEstado`, etc., y los formularios usan listas desplegables con
 `OpcionesEditoriales`, `OpcionesIdiomas`, `OpcionesPersonas`, etc.
 
-Los ids siguen existiendo en la base de datos y en los campos ocultos, pero ya no
-se muestran como columnas. Así un ADMIN o BIBLIO elige **Alfaguara** o **Español**
-en lugar de tener que recordar que `3` es una editorial o `1` un idioma.
+Los ids se mantienen en la base de datos, en las tablas y en los campos ocultos.
+Las columnas de llaves foráneas muestran nombres en lugar de números; así un
+ADMIN o BIBLIO elige **Alfaguara** o **Español** en lugar de tener que recordar
+que `3` es una editorial o `1` un idioma.
 
 ## Migraciones
 

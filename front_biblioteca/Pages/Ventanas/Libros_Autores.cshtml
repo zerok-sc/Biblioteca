@@ -48,6 +48,7 @@
 <table>
     <thead>
         <tr>
+            <th>id</th>
             <th>Libro</th>
             <th>Autor</th>
             <th>Tipo participacion</th>
@@ -59,6 +60,7 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
+                <td>@item.id</td>
                 <td>@Model.Catalogos.NombreLibro(item.libro)</td>
                 <td>@Model.Catalogos.NombreAutor(item.autor)</td>
                 <td>@item.tipo_participacion</td>

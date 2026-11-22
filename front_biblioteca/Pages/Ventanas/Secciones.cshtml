@@ -44,6 +44,7 @@
 <table>
     <thead>
         <tr>
+            <th>id</th>
             <th>Nombre</th>
             <th>Descripcion</th>
             <th>Ubicacion</th>
@@ -55,6 +56,7 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
+                <td>@item.id</td>
                 <td>@item.nombre</td>
                 <td>@item.descripcion</td>
                 <td>@item.ubicacion</td>

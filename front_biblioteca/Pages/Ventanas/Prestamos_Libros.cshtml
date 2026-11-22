@@ -52,6 +52,7 @@
 <table>
     <thead>
         <tr>
+            <th>id</th>
             <th>Prestamo</th>
             <th>Ejemplar</th>
             <th>Estado</th>
@@ -63,6 +64,7 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
+                <td>@item.id</td>
                 <td>@Model.Catalogos.NombrePrestamo(item.prestamo)</td>
                 <td>@Model.Catalogos.NombreEjemplar(item.ejemplar)</td>
                 <td>@Model.Catalogos.NombreEstado(item.estado)</td>

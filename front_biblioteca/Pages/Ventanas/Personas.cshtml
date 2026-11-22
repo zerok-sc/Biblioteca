@@ -40,6 +40,7 @@
 <table>
     <thead>
         <tr>
+            <th>id</th>
             <th>Cedula</th>
             <th>Nombre</th>
             <th>Fecha nacimiento</th>
@@ -51,6 +52,7 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
+                <td>@item.id</td>
                 <td>@item.cedula</td>
                 <td>@item.nombre</td>
                 <td>@item.fecha_nacimiento</td>
