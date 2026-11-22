@@ -31,6 +31,7 @@ namespace front_biblioteca.Pages
 
         public IActionResult OnPostLimpiar()
         {
+            ModelState.Clear();
             Usuario = "";
             Clave = "";
             Error = null;
