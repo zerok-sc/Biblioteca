@@ -38,35 +38,42 @@ namespace presentacion_pruebas
         // ------------------------------------------------------------------
         //  Operaciones genericas
         // ------------------------------------------------------------------
-        protected T Guardar<T>(Func<IConexion, DbSet<T>?> tabla, T entidad) where T : class
+        protected T Guardar<T>(Func<IConexion, DbSet<T>?> tabla, T entidad) where T : class, IEntidad
         {
             var conexion = NuevaConexion();
             tabla(conexion)!.Add(entidad);
-            conexion.SaveChanges();
+            var insertadas = conexion.SaveChanges();
+            Assert.IsTrue(insertadas > 0, "No se insertó ningún registro.");
 
-            // Si la prueba falla a la mitad, igual se borra el registro.
             this.limpieza.Push(() =>
             {
                 var c = NuevaConexion();
-                tabla(c)!.Remove(entidad);
-                c.SaveChanges();
+                var tablaLimpieza = tabla(c)!;
+                if (!tablaLimpieza.Any(x => x.id == entidad.id))
+                    return;
+
+                tablaLimpieza.Remove(entidad);
+                var borradas = c.SaveChanges();
+                Assert.IsTrue(borradas > 0, "No se pudo limpiar el registro de prueba.");
             });
             return entidad;
         }
 
-        protected static void Modificar<T>(T entidad) where T : class
+        protected static void Modificar<T>(T entidad) where T : class, IEntidad
         {
             var conexion = NuevaConexion();
             var entry = conexion.Entry(entidad);
             entry.State = EntityState.Modified;
-            conexion.SaveChanges();
+            var modificadas = conexion.SaveChanges();
+            Assert.IsTrue(modificadas > 0, "No se modificó ningún registro.");
         }
 
-        protected static void Eliminar<T>(Func<IConexion, DbSet<T>?> tabla, T entidad) where T : class
+        protected static void Eliminar<T>(Func<IConexion, DbSet<T>?> tabla, T entidad) where T : class, IEntidad
         {
             var conexion = NuevaConexion();
             tabla(conexion)!.Remove(entidad);
-            conexion.SaveChanges();
+            var eliminadas = conexion.SaveChanges();
+            Assert.IsTrue(eliminadas > 0, "No se eliminó ningún registro.");
         }
 
         [TestCleanup]
@@ -79,9 +86,9 @@ namespace presentacion_pruebas
                 {
                     accion();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // El registro ya fue borrado por la propia prueba (paso "Borrar").
+                    Assert.Fail($"La limpieza de la prueba falló: {ex.Message}");
                 }
             }
         }
