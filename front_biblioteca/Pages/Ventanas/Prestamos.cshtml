@@ -1,10 +1,10 @@
 ﻿@page
 @model PrestamosModel
 @{
-    ViewData["Title"] = "Prestamos";
+    ViewData["Title"] = "Préstamos";
 }
 
-<h1>Prestamos</h1>
+<h1>Préstamos</h1>
 
 @if (ViewData.ContainsKey("Mensaje"))
 {
@@ -12,39 +12,105 @@
 }
 
 <form method="post" class="barra">
-    <input type="number" name="FiltroId" value="@Model.FiltroId" placeholder="Buscar por id" />
-    <button class="boton" asp-page-handler="Consultar">Consultar</button>
-    @if (!User.IsInRole("LECTOR"))
-    {
-        <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
-    }
+    <input type="text" name="BuscarNombre" value="@Model.BuscarNombre"
+           placeholder="Buscar usuario por nombre o cédula" />
+    <button class="boton" asp-page-handler="Buscar">Buscar usuario</button>
 </form>
+
+@if (!string.IsNullOrWhiteSpace(Model.BuscarNombre) && Model.Coincidencias.Count == 0)
+{
+    <p class="ayuda">No se encontraron usuarios con ese nombre.</p>
+}
+
+@if (Model.Coincidencias.Count > 0)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Cédula</th>
+                <th>Teléfono</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var persona in Model.Coincidencias)
+            {
+                <tr>
+                    <td>@persona.nombre</td>
+                    <td>@persona.cedula</td>
+                    <td>@persona.telefono</td>
+                    <td>
+                        <form method="post" style="display:inline">
+                            <input type="hidden" name="personaId" value="@persona.id" />
+                            <button class="boton" asp-page-handler="Seleccionar">Seleccionar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @if (Model.MostrarFormulario)
 {
+    <h2>Registrar préstamo</h2>
+
     <form method="post">
-        <input type="hidden" asp-for="Actual.id" />
+        <input type="hidden" asp-for="PersonaSeleccionada" />
+
+        <p>
+            <strong>Usuario seleccionado:</strong>
+            @Model.NombrePersonaSeleccionada
+        </p>
+
         <div class="campos">
-            <div><label>Codigo</label><input asp-for="Actual.codigo" /></div>
-            <div><label>Persona</label><input asp-for="Actual.persona" /></div>
-            <div><label>Empleado</label><input asp-for="Actual.empleado" /></div>
-            <div><label>Fecha</label><input asp-for="Actual.fecha" /></div>
+            <div>
+                <label>Tiempo (días)</label>
+                <input asp-for="Tiempo" type="number" min="1" />
+            </div>
+            <div>
+                <label>Fecha de inicio</label>
+                <input type="date" name="FechaInicio"
+                       value="@Model.FechaInicio.ToString("yyyy-MM-dd")" />
+            </div>
+            <div>
+                <label>Fecha final</label>
+                <input type="date" name="FechaFin"
+                       value="@(Model.FechaFin?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div>
+                <label>Estado</label>
+                <select asp-for="EstadoSeleccionado"
+                        asp-items="@(new Microsoft.AspNetCore.Mvc.Rendering.SelectList(Model.EstadosPrestamo, "id", "nombre"))">
+                </select>
+            </div>
+            <div>
+                <label>Empleado que registra</label>
+                <select asp-for="EmpleadoSeleccionado" asp-items="Model.OpcionesEmpleados">
+                </select>
+            </div>
         </div>
-        @if (!User.IsInRole("LECTOR"))
-        {
-            <button class="boton" asp-page-handler="Guardar">Guardar</button>
-        }
+
+        <p class="ayuda">Si deja la fecha final vacía, se calcula con el tiempo indicado.</p>
+
+        <button class="boton" asp-page-handler="CrearPrestamo">Registrar préstamo</button>
     </form>
 }
+
+<h2>Préstamos registrados</h2>
 
 <table>
     <thead>
         <tr>
             <th>id</th>
-            <th>Codigo</th>
-            <th>Persona</th>
+            <th>Código</th>
+            <th>Usuario</th>
             <th>Empleado</th>
-            <th>Fecha</th>
+            <th>Inicio</th>
+            <th>Final</th>
+            <th>Tiempo</th>
+            <th>Estado</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -54,17 +120,16 @@
             <tr>
                 <td>@item.id</td>
                 <td>@item.codigo</td>
-                <td>@item.persona</td>
-                <td>@item.empleado</td>
-                <td>@item.fecha</td>
+                <td>@Model.NombrePersona(item.persona)</td>
+                <td>@Model.NombreEmpleado(item.empleado)</td>
+                <td>@item.fecha_inicio.ToString("dd/MM/yyyy")</td>
+                <td>@item.fecha_fin.ToString("dd/MM/yyyy")</td>
+                <td>@item.tiempo días</td>
+                <td>@Model.NombreEstado(item.estado)</td>
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />
-                        @if (!User.IsInRole("LECTOR"))
-                        {
-                            <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
-                            <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
-                        }
+                        <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
                     </form>
                 </td>
             </tr>

@@ -133,6 +133,21 @@ La WebAPI la guarda como `VARBINARY(MAX)` en `Usuarios.foto`, junto con
 `Usuarios.foto_tipo`, y la página la muestra con `data:<tipo>;base64,...`.
 También aparece en la tabla de Usuarios y en el `Login` de la API.
 
+## Préstamos
+
+En `Pages/Ventanas/Prestamos.cshtml`, los roles ADMIN y BIBLIO pueden registrar un
+préstamo:
+
+1. Buscan al usuario por nombre o cédula.
+2. Pulsan **Seleccionar**.
+3. Indican tiempo en días, fecha de inicio, fecha final, estado y empleado.
+4. Pulsan **Registrar préstamo**.
+
+El código se genera automáticamente. Si la fecha final se deja vacía, se calcula
+con la fecha de inicio y el tiempo. La tabla `Prestamos` guarda `tiempo`,
+`fecha_inicio`, `fecha_fin` y `estado` (llave foránea a `Estados`), además de la
+persona y el empleado. El rol LECTOR no puede entrar a esta página.
+
 ## Migraciones
 
 ```

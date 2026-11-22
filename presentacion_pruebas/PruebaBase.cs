@@ -245,7 +245,11 @@ namespace presentacion_pruebas
                 codigo = Unico("PRES"),
                 persona = CrearPersona().id,
                 empleado = CrearEmpleado().id,
-                fecha = new DateTime(2025, 3, 10, 9, 0, 0)
+                fecha = new DateTime(2025, 3, 10, 9, 0, 0),
+                tiempo = 15,
+                fecha_inicio = new DateTime(2025, 3, 10, 9, 0, 0),
+                fecha_fin = new DateTime(2025, 3, 25, 9, 0, 0),
+                estado = CrearEstado().id
             });
         }
 

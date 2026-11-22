@@ -29,7 +29,11 @@ namespace presentacion_pruebas
                 codigo = Unico("PRES"),
                 persona = this.persona.id,
                 empleado = this.empleado.id,
-                fecha = new DateTime(2025, 3, 10, 9, 0, 0)
+                fecha = new DateTime(2025, 3, 10, 9, 0, 0),
+                tiempo = 15,
+                fecha_inicio = new DateTime(2025, 3, 10, 9, 0, 0),
+                fecha_fin = new DateTime(2025, 3, 25, 9, 0, 0),
+                estado = CrearEstado().id
             });
 
             Assert.IsTrue(this.entidad.id > 0, "No se generó el id.");
@@ -39,6 +43,10 @@ namespace presentacion_pruebas
             Assert.AreEqual(this.entidad.codigo, guardado.codigo);
             Assert.AreEqual(this.persona.id, guardado.persona);
             Assert.AreEqual(this.empleado.id, guardado.empleado);
+            Assert.AreEqual(15, guardado.tiempo);
+            Assert.AreEqual(new DateTime(2025, 3, 10, 9, 0, 0), guardado.fecha_inicio);
+            Assert.AreEqual(new DateTime(2025, 3, 25, 9, 0, 0), guardado.fecha_fin);
+            Assert.IsTrue(guardado.estado > 0, "No se guardó el estado del préstamo.");
         }
 
         private void Consultar()

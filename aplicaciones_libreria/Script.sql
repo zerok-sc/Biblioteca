@@ -149,7 +149,11 @@ CREATE TABLE [Prestamos] (
     [codigo] NVARCHAR(50) NOT NULL UNIQUE,
     [persona] INT NOT NULL REFERENCES [Personas]([id]),
     [empleado] INT NOT NULL REFERENCES [Empleados]([id]),
-    [fecha] SMALLDATETIME NOT NULL
+    [fecha] SMALLDATETIME NOT NULL,
+    [tiempo] INT NOT NULL DEFAULT 15,
+    [fecha_inicio] SMALLDATETIME NOT NULL,
+    [fecha_fin] SMALLDATETIME NOT NULL,
+    [estado] INT NOT NULL REFERENCES [Estados]([id])
 );
 
 CREATE TABLE [Prestamos_Libros] (
@@ -236,7 +240,9 @@ INSERT INTO [Estados] ([nombre], [codigo], [descripcion], [fecha_creacion]) VALU
 ('Inactivo',      'INA', 'Registro deshabilitado',                    GETDATE()),
 ('Prestado',      'PRE', 'El ejemplar se encuentra prestado',         GETDATE()),
 ('Disponible',    'DIS', 'El ejemplar está disponible para préstamo', GETDATE()),
-('Mantenimiento', 'MAN', 'El ejemplar está en reparación',            GETDATE());
+('Mantenimiento', 'MAN', 'El ejemplar está en reparación',            GETDATE()),
+('Devuelto',      'DEV', 'El préstamo ya fue devuelto',               GETDATE()),
+('Atrasado',      'ATR', 'El préstamo superó la fecha de entrega',    GETDATE());
 
 INSERT INTO [Roles] ([nombre], [codigo], [descripcion], [fecha_creacion]) VALUES
 ('Administrador', 'ADMIN',  'Acceso total al sistema',          GETDATE()),
@@ -363,12 +369,14 @@ INSERT INTO [Ejemplares] ([codigo], [estado], [libro], [ubicacion]) VALUES
 ('EJM-004', 4, 4, 4),
 ('EJM-005', 5, 5, 5);
 
-INSERT INTO [Prestamos] ([codigo], [persona], [empleado], [fecha]) VALUES
-('PRES-01', 1, 1, GETDATE()),
-('PRES-02', 2, 2, GETDATE()),
-('PRES-03', 3, 1, GETDATE()),
-('PRES-04', 4, 3, GETDATE()),
-('PRES-05', 5, 2, GETDATE());
+INSERT INTO [Prestamos]
+    ([codigo], [persona], [empleado], [fecha], [tiempo], [fecha_inicio], [fecha_fin], [estado])
+VALUES
+('PRES-01', 1, 1, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE')),
+('PRES-02', 2, 2, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE')),
+('PRES-03', 3, 1, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE')),
+('PRES-04', 4, 3, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE')),
+('PRES-05', 5, 2, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE'));
 
 INSERT INTO [Prestamos_Libros] ([prestamo], [ejemplar], [estado], [fecha]) VALUES
 (1, 1, 3, DATEADD(DAY, 15, GETDATE())),
