@@ -7,7 +7,7 @@ namespace front_biblioteca.nucleo
 {
     public abstract class PaginaBase<T> : PageModel where T : class, IEntidad, new()
     {
-        private readonly IPresentacion<T> presentacion;
+        protected readonly IPresentacion<T> presentacion;
 
         [BindProperty] public T Actual { get; set; } = new();
         [BindProperty] public int FiltroId { get; set; }
@@ -123,11 +123,17 @@ namespace front_biblioteca.nucleo
             ViewData["Mensaje"] = mensaje;
         }
 
+        protected virtual Task CargarCatalogosAsync()
+        {
+            return Task.CompletedTask;
+        }
+
         private async Task CargarAsync()
         {
             try
             {
                 Lista = await presentacion.Consultar();
+                await CargarCatalogosAsync();
             }
             catch (Exception ex)
             {

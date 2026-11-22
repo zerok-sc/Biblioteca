@@ -30,14 +30,25 @@
     <form method="post">
         <input type="hidden" asp-for="Actual.id" />
         <div class="campos">
-            <div><label>Nombre usuario</label><input asp-for="Actual.nombre_usuario" /></div>
-            <div><label>Correo</label><input asp-for="Actual.correo" /></div>
-            <div><label>Rol</label><input asp-for="Actual.rol" /></div>
-            <div><label>Persona</label><input asp-for="Actual.persona" /></div>
+            <div><label>Nombre usuario</label><input asp-for="Actual.nombre_usuario" required /></div>
+            <div><label>Correo</label><input asp-for="Actual.correo" required /></div>
+            <div>
+                <label>Rol</label>
+                <select asp-for="Actual.rol" required
+                        asp-items="@(new Microsoft.AspNetCore.Mvc.Rendering.SelectList(Model.ListaRoles, "id", "nombre"))">
+                    <option value="">Seleccione un rol</option>
+                </select>
+            </div>
+            <div>
+                <label>Persona</label>
+                <select asp-for="Actual.persona" required
+                        asp-items="@(new Microsoft.AspNetCore.Mvc.Rendering.SelectList(Model.ListaPersonas, "id", "nombre"))">
+                    <option value="">Seleccione una persona</option>
+                </select>
+            </div>
             <div><label>Activo</label><input asp-for="Actual.activo" /></div>
-            <div><label>Fecha creacion</label><input asp-for="Actual.fecha_creacion" /></div>
-            <div><label>Ultimo acceso</label><input asp-for="Actual.ultimo_acceso" /></div>
         </div>
+        <p class="ayuda">La clave y la foto no se cambian desde este formulario.</p>
         @if (!User.IsInRole("LECTOR"))
         {
             <button class="boton" asp-page-handler="Guardar">Guardar</button>

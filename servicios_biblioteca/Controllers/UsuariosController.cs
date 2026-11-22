@@ -106,6 +106,84 @@ namespace servicios_biblioteca.Controllers
         }
 
         [HttpPost]
+        public override async Task<ActionResult<Usuarios>> Actualizar([FromBody] Usuarios entidad)
+        {
+            var nombre = entidad.nombre_usuario?.Trim();
+            var correo = entidad.correo?.Trim();
+
+            if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(correo))
+            {
+                return BadRequest(new RespuestaSimple
+                {
+                    mensaje = "Usuario y correo son obligatorios."
+                });
+            }
+
+            if (nombre.Length > 50 || correo.Length > 100)
+            {
+                return BadRequest(new RespuestaSimple
+                {
+                    mensaje = "El usuario admite 50 caracteres y el correo 100."
+                });
+            }
+
+            var actual = await conexion.Usuarios!
+                .AsTracking()
+                .FirstOrDefaultAsync(x => x.id == entidad.id);
+
+            if (actual is null)
+            {
+                return NotFound(new RespuestaSimple
+                {
+                    mensaje = "El usuario que intenta actualizar no existe."
+                });
+            }
+
+            var repetido = await conexion.Usuarios!
+                .AnyAsync(x => x.id != entidad.id
+                    && (x.nombre_usuario == nombre || x.correo == correo));
+
+            if (repetido)
+            {
+                return Conflict(new RespuestaSimple
+                {
+                    mensaje = "Ese usuario o correo ya está registrado."
+                });
+            }
+
+            var rolExiste = await conexion.Roles!.AnyAsync(x => x.id == entidad.rol);
+            var personaExiste = await conexion.Personas!.AnyAsync(x => x.id == entidad.persona);
+
+            if (!rolExiste || !personaExiste)
+            {
+                return BadRequest(new RespuestaSimple
+                {
+                    mensaje = "Seleccione un rol y una persona válidos."
+                });
+            }
+
+            actual.nombre_usuario = nombre;
+            actual.correo = correo;
+            actual.rol = entidad.rol;
+            actual.persona = entidad.persona;
+            actual.activo = entidad.activo;
+
+            try
+            {
+                await conexion.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return Conflict(new RespuestaSimple
+                {
+                    mensaje = "No se pudo guardar el usuario. Revise los datos e intente de nuevo."
+                });
+            }
+
+            return actual;
+        }
+
+        [HttpPost]
         public async Task<ActionResult<DatosFoto>> ObtenerFoto([FromBody] PedidoFoto pedido)
         {
             var foto = await conexion.Usuarios!

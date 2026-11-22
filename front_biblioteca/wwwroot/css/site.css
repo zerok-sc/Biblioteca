@@ -145,6 +145,11 @@ th {
     border-radius: 5px;
 }
 
+.ayuda {
+    color: #6b5b4b;
+    font-size: 0.9rem;
+}
+
 .aviso {
     padding: 10px 14px;
     border-radius: 6px;

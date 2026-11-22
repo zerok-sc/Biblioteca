@@ -39,7 +39,7 @@ namespace servicios_biblioteca.Controllers
         }
 
         [HttpPost]
-        public async Task<T> Actualizar([FromBody] T entidad)
+        public virtual async Task<ActionResult<T>> Actualizar([FromBody] T entidad)
         {
             await repositorio.ActualizarAsync(entidad);
             return entidad;
