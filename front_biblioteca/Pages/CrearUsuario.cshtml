@@ -1,0 +1,50 @@
+@page
+@model CrearUsuarioModel
+@{
+    ViewData["Title"] = "Crear usuario";
+}
+
+<h1>Crear usuario</h1>
+<p>La clave se guarda cifrada con sal en la tabla Usuarios.</p>
+
+@if (ViewData.ContainsKey("Mensaje"))
+{
+    @await Html.PartialAsync("~/Pages/Emergentes/Mensajes.cshtml");
+}
+
+<form method="post">
+    <div class="campos">
+        <div>
+            <label>Usuario</label>
+            <input asp-for="Formulario.nombre_usuario" />
+        </div>
+        <div>
+            <label>Correo</label>
+            <input asp-for="Formulario.correo" />
+        </div>
+        <div>
+            <label>Clave</label>
+            <input type="password" asp-for="Formulario.clave" />
+        </div>
+        <div>
+            <label>Confirmar clave</label>
+            <input type="password" asp-for="ConfirmarClave" />
+        </div>
+        <div>
+            <label>Rol</label>
+            <select asp-for="Formulario.rol"
+                    asp-items="@(new SelectList(Model.ListaRoles, "id", "nombre"))"></select>
+        </div>
+        <div>
+            <label>Persona</label>
+            <select asp-for="Formulario.persona"
+                    asp-items="@(new SelectList(Model.ListaPersonas, "id", "nombre"))"></select>
+        </div>
+        <div>
+            <label>Activo</label>
+            <input asp-for="Formulario.activo" />
+        </div>
+    </div>
+    <button class="boton" type="submit">Crear usuario</button>
+    <a asp-page="/Ventanas/Usuarios" class="boton boton-claro">Volver a Usuarios</a>
+</form>

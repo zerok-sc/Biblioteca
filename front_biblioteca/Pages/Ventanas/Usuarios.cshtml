@@ -20,6 +20,11 @@
     }
 </form>
 
+@if (User.IsInRole("ADMIN"))
+{
+    <p><a asp-page="/CrearUsuario" class="boton">Crear usuario</a></p>
+}
+
 @if (Model.MostrarFormulario)
 {
     <form method="post">

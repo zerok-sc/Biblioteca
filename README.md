@@ -110,6 +110,11 @@ cookies + `Claims` (`ClaimTypes.Role`), con `UseAuthentication()` y
   los botones: aunque llame al handler, no puede insertar, modificar ni borrar.
 - `Pages/Index.cshtml.cs` filtra el menú con `PuedeVer()` para que un usuario
   cualquiera no vea enlaces a los que no tiene acceso.
+- El botón **Crear usuario** aparece solo para ADMIN, en la ventana Usuarios y en
+  el menú. `Pages/CrearUsuario.cshtml.cs` envía el alta a `Usuarios/CrearUsuario`:
+  la WebAPI genera la sal, calcula el `SHA256` de `clave + sal`, valida duplicados
+  y toma los roles y personas desde la base de datos. La clave nunca se guarda
+  en texto plano.
 
 ## Errores y mensajes
 

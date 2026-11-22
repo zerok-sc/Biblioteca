@@ -1,5 +1,6 @@
 using aplicaciones_libreria.nucleo;
 using presentacion_libreria.interfaces;
+using presentacion_libreria.nucleo;
 
 namespace presentacion_libreria.implementaciones
 {
@@ -20,10 +21,18 @@ namespace presentacion_libreria.implementaciones
                     "Usuarios/Login",
                     new PedidoLogin { usuario = usuario, clave = clave });
             }
-            catch (HttpRequestException ex) when (ex.Message.Contains("401"))
+            catch (ApiExcepcion ex) when (ex.Codigo == 401)
             {
                 return null;
             }
+        }
+
+        public async Task<string> CrearUsuario(PedidoCrearUsuario pedido)
+        {
+            var respuesta = await comunicaciones.Ejecutar<RespuestaSimple>(
+                "Usuarios/CrearUsuario", pedido);
+
+            return respuesta.mensaje;
         }
 
         public async Task<string?> ObtenerFoto(int id)

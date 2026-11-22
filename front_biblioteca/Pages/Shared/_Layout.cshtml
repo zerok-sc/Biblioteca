@@ -21,6 +21,10 @@
                     @User.Identity.Name
                     <small>(@User.FindFirst("RolNombre")?.Value)</small>
                 </span>
+                @if (User.IsInRole("ADMIN"))
+                {
+                    <a asp-page="/CrearUsuario">Crear usuario</a>
+                }
                 <a asp-page="/Perfil">Mi perfil</a>
                 <form method="post" asp-page="/Logout" style="display:inline">
                     <button class="boton boton-claro" type="submit">Salir</button>

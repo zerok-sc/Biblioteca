@@ -29,7 +29,21 @@ namespace presentacion_libreria.implementaciones
             var texto = await respuesta.Content.ReadAsStringAsync();
 
             if (!respuesta.IsSuccessStatusCode)
-                throw new HttpRequestException($"Error {respuesta.StatusCode} en {url}: {texto}");
+            {
+                var mensaje = texto;
+                try
+                {
+                    var simple = JsonConvert.DeserializeObject<aplicaciones_libreria.nucleo.RespuestaSimple>(texto);
+                    if (simple is { mensaje.Length: > 0 })
+                        mensaje = simple.mensaje;
+                }
+                catch (JsonException)
+                {
+                    // El cuerpo no era JSON; se muestra tal cual.
+                }
+
+                throw new ApiExcepcion((int)respuesta.StatusCode, $"Error {(int)respuesta.StatusCode} en {url}: {mensaje}");
+            }
 
             return JsonConvert.DeserializeObject<T>(texto)!;
         }

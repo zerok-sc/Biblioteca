@@ -137,7 +137,8 @@ th {
     color: #6b5847;
 }
 
-.campos input {
+.campos input,
+.campos select {
     width: 100%;
     padding: 7px;
     border: 1px solid #c9bba8;

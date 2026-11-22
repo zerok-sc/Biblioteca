@@ -3,6 +3,7 @@ using aplicaciones_libreria.implementaciones;
 using aplicaciones_libreria.interfaces;
 using aplicaciones_libreria.nucleo;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 
 namespace servicios_biblioteca.Controllers
@@ -49,6 +50,59 @@ namespace servicios_biblioteca.Controllers
                     : null,
                 imagen_tipo = usuario.foto_tipo
             };
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<RespuestaSimple>> CrearUsuario([FromBody] PedidoCrearUsuario pedido)
+        {
+            if (string.IsNullOrWhiteSpace(pedido.nombre_usuario)
+                || string.IsNullOrWhiteSpace(pedido.correo)
+                || string.IsNullOrWhiteSpace(pedido.clave))
+            {
+                return BadRequest(new RespuestaSimple
+                {
+                    mensaje = "Usuario, correo y clave son obligatorios."
+                });
+            }
+
+            var repetido = await conexion.Usuarios!
+                .AnyAsync(x => x.nombre_usuario == pedido.nombre_usuario || x.correo == pedido.correo);
+
+            if (repetido)
+            {
+                return Conflict(new RespuestaSimple
+                {
+                    mensaje = "Ese usuario o correo ya está registrado."
+                });
+            }
+
+            var rolExiste = await conexion.Roles!.AnyAsync(x => x.id == pedido.rol);
+            var personaExiste = await conexion.Personas!.AnyAsync(x => x.id == pedido.persona);
+            if (!rolExiste || !personaExiste)
+            {
+                return BadRequest(new RespuestaSimple
+                {
+                    mensaje = "Seleccione un rol y una persona válidos."
+                });
+            }
+
+            var sal = RandomNumberGenerator.GetBytes(16);
+            var entidad = new Usuarios
+            {
+                nombre_usuario = pedido.nombre_usuario,
+                correo = pedido.correo,
+                password_salt = sal,
+                password_hash = ClaveSeguridad.Hash(pedido.clave, sal),
+                rol = pedido.rol,
+                persona = pedido.persona,
+                activo = pedido.activo,
+                fecha_creacion = DateTime.Now
+            };
+
+            conexion.Usuarios!.Add(entidad);
+            await conexion.SaveChangesAsync();
+
+            return new RespuestaSimple { mensaje = "Usuario creado correctamente." };
         }
 
         [HttpPost]
