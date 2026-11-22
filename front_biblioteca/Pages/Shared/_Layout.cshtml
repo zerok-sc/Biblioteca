@@ -14,6 +14,22 @@
                 Biblioteca
             </a>
             <a asp-page="/Index">Inicio</a>
+            <span class="espacio"></span>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <span class="usuario">
+                    @User.Identity.Name
+                    <small>(@User.FindFirst("RolNombre")?.Value)</small>
+                </span>
+                <a asp-page="/Perfil">Mi perfil</a>
+                <form method="post" asp-page="/Logout" style="display:inline">
+                    <button class="boton boton-claro" type="submit">Salir</button>
+                </form>
+            }
+            else
+            {
+                <a asp-page="/Login">Ingresar</a>
+            }
         </nav>
     </header>
     <main class="contenido">

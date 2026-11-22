@@ -20,6 +20,8 @@ namespace aplicaciones_libreria.configuraciones
             builder.Property(x => x.activo).HasDefaultValue(true);
             builder.Property(x => x.fecha_creacion).HasColumnType("smalldatetime");
             builder.Property(x => x.ultimo_acceso).HasColumnType("smalldatetime");
+            builder.Property(x => x.foto).HasColumnType("varbinary(max)");
+            builder.Property(x => x.foto_tipo).HasMaxLength(50);
 
             builder.HasOne(x => x._rol)
                 .WithMany(x => x.usuarios)

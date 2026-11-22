@@ -1,0 +1,38 @@
+﻿@page
+@model PerfilModel
+@{
+    ViewData["Title"] = "Mi perfil";
+}
+
+<h1>Mi perfil</h1>
+
+@if (ViewData.ContainsKey("Mensaje"))
+{
+    @await Html.PartialAsync("~/Pages/Emergentes/Mensajes.cshtml");
+}
+
+<div class="perfil">
+    <div>
+        @if (!string.IsNullOrEmpty(Model.Imagen))
+        {
+            <img height="120" width="120" class="foto"
+                 src="data:@Model.TipoImagen;base64,@Model.Imagen"
+                 alt="Foto de perfil" />
+        }
+        else
+        {
+            <div class="foto sin-foto">Sin foto</div>
+        }
+    </div>
+    <div>
+        <p><strong>Usuario:</strong> @Model.Nombre</p>
+        <p><strong>Correo:</strong> @Model.Correo</p>
+        <p><strong>Rol:</strong> @Model.Rol</p>
+    </div>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+    <label>Cambiar foto (máximo 2 MB)</label>
+    <input type="file" accept="image/*" asp-for="FormFile" />
+    <button class="boton" type="submit">Guardar foto</button>
+</form>

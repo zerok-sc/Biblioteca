@@ -4,7 +4,7 @@ namespace aplicaciones_libreria.nucleo
     {
         public static string StringConexion()
         {
-            return "server=localhost;database=biblioteca_db;Integrated Security=True;TrustServerCertificate=true;";
+            return "Server=localhost,1433;Database=biblioteca_db;User Id=sa;Password=Biblioteca#2026;TrustServerCertificate=True;";
         }
     }
 }

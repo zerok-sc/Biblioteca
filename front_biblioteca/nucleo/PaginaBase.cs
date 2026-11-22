@@ -10,9 +10,8 @@ namespace front_biblioteca.nucleo
         private readonly IPresentacion<T> presentacion;
 
         [BindProperty] public T Actual { get; set; } = new();
+        [BindProperty] public int FiltroId { get; set; }
         public List<T> Lista { get; set; } = new();
-        public string? Mensaje { get; set; }
-        public string? Error { get; set; }
         public bool MostrarFormulario { get; set; }
 
         protected PaginaBase(IPresentacion<T> presentacion)
@@ -20,13 +19,36 @@ namespace front_biblioteca.nucleo
             this.presentacion = presentacion;
         }
 
+        private bool SoloLectura => User.IsInRole("LECTOR");
+
         public async Task OnGetAsync()
         {
             await CargarAsync();
         }
 
+        public async Task OnPostConsultarAsync()
+        {
+            ViewData.Remove("Mensaje");
+            try
+            {
+                Lista = FiltroId > 0
+                    ? await presentacion.Buscar(new T { id = FiltroId })
+                    : await presentacion.Consultar();
+            }
+            catch (Exception ex)
+            {
+                LogConversor.Log(ex, ViewData);
+            }
+        }
+
         public async Task OnPostNuevoAsync()
         {
+            if (SoloLectura)
+            {
+                Avisar("El rol Lector solo puede consultar.");
+                return;
+            }
+
             Actual = new T();
             MostrarFormulario = true;
             await CargarAsync();
@@ -34,6 +56,12 @@ namespace front_biblioteca.nucleo
 
         public async Task OnPostEditarAsync(int id)
         {
+            if (SoloLectura)
+            {
+                Avisar("El rol Lector solo puede consultar.");
+                return;
+            }
+
             await CargarAsync();
             Actual = Lista.FirstOrDefault(x => x.id == id) ?? new T { id = id };
             MostrarFormulario = true;
@@ -41,17 +69,23 @@ namespace front_biblioteca.nucleo
 
         public async Task OnPostGuardarAsync()
         {
+            if (SoloLectura)
+            {
+                Avisar("El rol Lector solo puede consultar.");
+                return;
+            }
+
             try
             {
                 Actual = Actual.id == 0
                     ? await presentacion.Insertar(Actual)
                     : await presentacion.Actualizar(Actual);
-                Mensaje = "Registro guardado correctamente.";
+                Avisar("Registro guardado correctamente.");
                 MostrarFormulario = false;
             }
             catch (Exception ex)
             {
-                Error = ex.Message;
+                LogConversor.Log(ex, ViewData);
             }
 
             await CargarAsync();
@@ -59,17 +93,34 @@ namespace front_biblioteca.nucleo
 
         public async Task OnPostBorrarAsync(int id)
         {
+            if (SoloLectura)
+            {
+                Avisar("El rol Lector solo puede consultar.");
+                return;
+            }
+
             try
             {
                 await presentacion.Borrar(new T { id = id });
-                Mensaje = "Registro eliminado correctamente.";
+                Avisar("Registro eliminado correctamente.");
             }
             catch (Exception ex)
             {
-                Error = ex.Message;
+                LogConversor.Log(ex, ViewData);
             }
 
             await CargarAsync();
+        }
+
+        public async Task OnPostCerrarAsync()
+        {
+            ViewData.Remove("Mensaje");
+            await CargarAsync();
+        }
+
+        protected void Avisar(string mensaje)
+        {
+            ViewData["Mensaje"] = mensaje;
         }
 
         private async Task CargarAsync()
@@ -80,7 +131,7 @@ namespace front_biblioteca.nucleo
             }
             catch (Exception ex)
             {
-                Error = $"No se pudo consultar la WebAPI: {ex.Message}";
+                LogConversor.Log(new Exception("No se pudo consultar la WebAPI: " + ex.Message), ViewData);
                 Lista = new List<T>();
             }
         }

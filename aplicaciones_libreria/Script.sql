@@ -195,7 +195,9 @@ CREATE TABLE [Usuarios] (
     [persona] INT NOT NULL REFERENCES [Personas]([id]),
     [activo] BIT NOT NULL DEFAULT 1,
     [fecha_creacion] SMALLDATETIME NOT NULL,
-    [ultimo_acceso] SMALLDATETIME NULL
+    [ultimo_acceso] SMALLDATETIME NULL,
+    [foto] VARBINARY(MAX) NULL,
+    [foto_tipo] NVARCHAR(50) NULL
 );
 
 CREATE TABLE [Sesiones] (
@@ -249,6 +251,18 @@ VALUES
      CONVERT(VARBINARY(16), 'biblioteca-sal'),
      (SELECT id FROM [Roles] WHERE codigo = 'ADMIN'),
      (SELECT id FROM [Personas] WHERE cedula = '10101'),
+     1, GETDATE()),
+    ('bibliotecario', 'biblio@biblioteca.com',
+     HASHBYTES('SHA2_256', 'biblio123saltbiblio000001'),
+     CONVERT(VARBINARY(16), 'saltbiblio000001'),
+     (SELECT id FROM [Roles] WHERE codigo = 'BIBLIO'),
+     (SELECT id FROM [Personas] WHERE cedula = '30303'),
+     1, GETDATE()),
+    ('lector', 'lector@biblioteca.com',
+     HASHBYTES('SHA2_256', 'lector123saltlector000001'),
+     CONVERT(VARBINARY(16), 'saltlector000001'),
+     (SELECT id FROM [Roles] WHERE codigo = 'LECTOR'),
+     (SELECT id FROM [Personas] WHERE cedula = '40404'),
      1, GETDATE());
 
 INSERT INTO [Editoriales] ([nombre], [pais], [telefono], [correo]) VALUES

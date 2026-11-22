@@ -15,6 +15,8 @@ namespace aplicaciones_libreria.entidades
         public bool activo { get; set; }
         public DateTime fecha_creacion { get; set; }
         public DateTime? ultimo_acceso { get; set; }
+        public byte[]? foto { get; set; }
+        public string? foto_tipo { get; set; }
 
         [ForeignKey("rol")] public Roles? _rol { get; set; }
         [ForeignKey("persona")] public Personas? _persona { get; set; }

@@ -6,17 +6,18 @@
 
 <h1>Ejemplares</h1>
 
-@if (!string.IsNullOrEmpty(Model.Mensaje))
+@if (ViewData.ContainsKey("Mensaje"))
 {
-    <div class="aviso">@Model.Mensaje</div>
-}
-@if (!string.IsNullOrEmpty(Model.Error))
-{
-    <div class="error">@Model.Error</div>
+    @await Html.PartialAsync("~/Pages/Emergentes/Mensajes.cshtml");
 }
 
-<form method="post">
-    <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
+<form method="post" class="barra">
+    <input type="number" name="FiltroId" value="@Model.FiltroId" placeholder="Buscar por id" />
+    <button class="boton" asp-page-handler="Consultar">Consultar</button>
+    @if (!User.IsInRole("LECTOR"))
+    {
+        <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
+    }
 </form>
 
 @if (Model.MostrarFormulario)
@@ -29,7 +30,10 @@
             <div><label>Libro</label><input asp-for="Actual.libro" /></div>
             <div><label>Ubicacion</label><input asp-for="Actual.ubicacion" /></div>
         </div>
-        <button class="boton" asp-page-handler="Guardar">Guardar</button>
+        @if (!User.IsInRole("LECTOR"))
+        {
+            <button class="boton" asp-page-handler="Guardar">Guardar</button>
+        }
     </form>
 }
 
@@ -56,8 +60,11 @@
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />
-                        <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
-                        <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
+                        @if (!User.IsInRole("LECTOR"))
+                        {
+                            <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
+                            <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
+                        }
                     </form>
                 </td>
             </tr>

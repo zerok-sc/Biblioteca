@@ -1,0 +1,29 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Ingresar";
+}
+
+<h1>Ingresar</h1>
+<p>Use el usuario y la clave registrados en la base de datos.</p>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="error">@Model.Error</div>
+}
+
+<form method="post">
+    <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+    <div class="campos">
+        <div>
+            <label>Usuario</label>
+            <input asp-for="Usuario" autocomplete="username" />
+        </div>
+        <div>
+            <label>Contraseña</label>
+            <input type="password" asp-for="Clave" autocomplete="current-password" />
+        </div>
+    </div>
+    <button class="boton" type="submit">Entrar</button>
+    <button class="boton boton-claro" asp-page-handler="Limpiar">Limpiar</button>
+</form>
