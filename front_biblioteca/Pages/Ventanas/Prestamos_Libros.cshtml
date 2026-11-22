@@ -1,0 +1,66 @@
+﻿@page
+@model Prestamos_LibrosModel
+@{
+    ViewData["Title"] = "Prestamos_Libros";
+}
+
+<h1>Prestamos_Libros</h1>
+
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="aviso">@Model.Mensaje</div>
+}
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="error">@Model.Error</div>
+}
+
+<form method="post">
+    <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
+</form>
+
+@if (Model.MostrarFormulario)
+{
+    <form method="post">
+        <input type="hidden" asp-for="Actual.id" />
+        <div class="campos">
+            <div><label>Prestamo</label><input asp-for="Actual.prestamo" /></div>
+            <div><label>Ejemplar</label><input asp-for="Actual.ejemplar" /></div>
+            <div><label>Estado</label><input asp-for="Actual.estado" /></div>
+            <div><label>Fecha</label><input asp-for="Actual.fecha" /></div>
+        </div>
+        <button class="boton" asp-page-handler="Guardar">Guardar</button>
+    </form>
+}
+
+<table>
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>Prestamo</th>
+            <th>Ejemplar</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Lista)
+        {
+            <tr>
+                <td>@item.id</td>
+                <td>@item.prestamo</td>
+                <td>@item.ejemplar</td>
+                <td>@item.estado</td>
+                <td>@item.fecha</td>
+                <td>
+                    <form method="post" style="display:inline">
+                        <input type="hidden" name="id" value="@item.id" />
+                        <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
+                        <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

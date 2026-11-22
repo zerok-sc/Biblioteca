@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\aplicaciones_libreria\aplicaciones_libreria.csproj" />
+    <ProjectReference Include="..\presentacion_libreria\presentacion_libreria.csproj" />
+  </ItemGroup>
+
+</Project>

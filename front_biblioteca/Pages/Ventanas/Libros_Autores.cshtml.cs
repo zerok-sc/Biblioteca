@@ -1,0 +1,13 @@
+﻿using aplicaciones_libreria.entidades;
+using front_biblioteca.nucleo;
+using presentacion_libreria.interfaces;
+
+namespace front_biblioteca.Pages.Ventanas
+{
+    public class Libros_AutoresModel : PaginaBase<Libros_Autores>
+    {
+        public Libros_AutoresModel(IPresentacion<Libros_Autores> presentacion) : base(presentacion)
+        {
+        }
+    }
+}

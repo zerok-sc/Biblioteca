@@ -1,0 +1,149 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f1ea;
+    color: #2f2a25;
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 32px;
+    background: #3b2f2f;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.menu a {
+    color: #f8f3e8;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+}
+
+.logo {
+    width: 34px;
+    height: 34px;
+}
+
+.contenido {
+    max-width: 1080px;
+    margin: 28px auto;
+    padding: 0 20px;
+}
+
+h1 {
+    color: #5b3a29;
+}
+
+.tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+}
+
+.tarjetas a {
+    display: block;
+    padding: 14px;
+    background: #fffdf8;
+    border: 1px solid #ded3c2;
+    border-radius: 8px;
+    color: #5b3a29;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.tarjetas a:hover {
+    background: #efe2cf;
+}
+
+.boton {
+    display: inline-block;
+    margin: 4px 2px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 6px;
+    background: #7c4f3a;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.boton-claro {
+    background: #b9a289;
+}
+
+.boton-peligro {
+    background: #a23b3b;
+}
+
+form {
+    margin-bottom: 18px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fffdf8;
+}
+
+th, td {
+    padding: 8px;
+    border: 1px solid #ded3c2;
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background: #efe2cf;
+}
+
+.campos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.campos label {
+    display: block;
+    font-size: 13px;
+    color: #6b5847;
+}
+
+.campos input {
+    width: 100%;
+    padding: 7px;
+    border: 1px solid #c9bba8;
+    border-radius: 5px;
+}
+
+.aviso {
+    padding: 10px 14px;
+    border-radius: 6px;
+    background: #e4efdc;
+}
+
+.error {
+    padding: 10px 14px;
+    border-radius: 6px;
+    background: #f8dcdc;
+}
+
+footer {
+    text-align: center;
+    padding: 18px;
+    color: #7a6d5f;
+}

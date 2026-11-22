@@ -1,0 +1,63 @@
+﻿@page
+@model EmpleadosModel
+@{
+    ViewData["Title"] = "Empleados";
+}
+
+<h1>Empleados</h1>
+
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="aviso">@Model.Mensaje</div>
+}
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="error">@Model.Error</div>
+}
+
+<form method="post">
+    <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
+</form>
+
+@if (Model.MostrarFormulario)
+{
+    <form method="post">
+        <input type="hidden" asp-for="Actual.id" />
+        <div class="campos">
+            <div><label>Persona</label><input asp-for="Actual.persona" /></div>
+            <div><label>Cargo</label><input asp-for="Actual.cargo" /></div>
+            <div><label>Fecha contratacion</label><input asp-for="Actual.fecha_contratacion" /></div>
+        </div>
+        <button class="boton" asp-page-handler="Guardar">Guardar</button>
+    </form>
+}
+
+<table>
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>Persona</th>
+            <th>Cargo</th>
+            <th>Fecha contratacion</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Lista)
+        {
+            <tr>
+                <td>@item.id</td>
+                <td>@item.persona</td>
+                <td>@item.cargo</td>
+                <td>@item.fecha_contratacion</td>
+                <td>
+                    <form method="post" style="display:inline">
+                        <input type="hidden" name="id" value="@item.id" />
+                        <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
+                        <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

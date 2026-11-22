@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Biblioteca</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav class="menu">
+            <a class="marca" asp-page="/Index">
+                <img src="~/img/libro.svg" alt="Biblioteca" class="logo" />
+                Biblioteca
+            </a>
+            <a asp-page="/Index">Inicio</a>
+        </nav>
+    </header>
+    <main class="contenido">
+        @RenderBody()
+    </main>
+    <footer>Sistema de gestión de biblioteca - ITM</footer>
+</body>
+</html>
