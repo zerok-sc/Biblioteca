@@ -32,7 +32,6 @@ namespace front_biblioteca.Pages
 
         public List<Prestamos> Atrasados { get; private set; } = new();
         public List<Prestamos> PorVencer { get; private set; } = new();
-        public List<LibroPrestado> LibrosMasPrestados { get; private set; } = new();
 
         public IndexModel(Catalogos catalogos)
         {
@@ -86,21 +85,6 @@ namespace front_biblioteca.Pages
                     .OrderBy(x => x.fecha_fin)
                     .Take(5)
                     .ToList();
-
-                LibrosMasPrestados = catalogos.ListaPrestamosLibros
-                    .Select(x => catalogos.ListaEjemplares.FirstOrDefault(e => e.id == x.ejemplar))
-                    .Where(e => e is not null)
-                    .GroupBy(e => e!.libro)
-                    .Select(g => new LibroPrestado
-                    {
-                        id = g.Key,
-                        Nombre = catalogos.NombreLibro(g.Key),
-                        Veces = g.Count()
-                    })
-                    .OrderByDescending(x => x.Veces)
-                    .ThenBy(x => x.Nombre)
-                    .Take(5)
-                    .ToList();
             }
             catch (Exception ex)
             {
@@ -147,12 +131,5 @@ namespace front_biblioteca.Pages
                 ? "etiqueta-atrasado"
                 : "etiqueta-vencer";
         }
-    }
-
-    public class LibroPrestado
-    {
-        public int id { get; set; }
-        public string Nombre { get; set; } = "";
-        public int Veces { get; set; }
     }
 }

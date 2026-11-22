@@ -1,0 +1,91 @@
+@page
+@model MisPrestamosModel
+@{
+    ViewData["Title"] = "Mis préstamos";
+}
+
+<h1>Mis préstamos y multas</h1>
+<p>Préstamos registrados a nombre de <strong>@Model.NombrePersona</strong> (persona @Model.PersonaId).</p>
+
+@if (ViewData.ContainsKey("Mensaje"))
+{
+    @await Html.PartialAsync("~/Pages/Emergentes/Mensajes.cshtml");
+}
+
+<ul class="tarjetas resumen">
+    <li>Préstamos activos <strong>@Model.PrestamosActivos</strong></li>
+    <li>Atrasados <strong>@Model.PrestamosAtrasados</strong></li>
+    <li>Por vencer (3 días) <strong>@Model.PrestamosPorVencer</strong></li>
+    <li>Multas pendientes <strong>@Model.MultasPendientes</strong></li>
+    <li>Valor multas <strong>$ @Model.ValorMultasPendientes.ToString("N0")</strong></li>
+</ul>
+
+<h2>Mis préstamos</h2>
+
+@if (Model.Prestamos.Count == 0)
+{
+    <p class="aviso">Aún no tiene préstamos registrados.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Código</th>
+                <th>Ejemplares</th>
+                <th>Inicio</th>
+                <th>Final</th>
+                <th>Situación</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Prestamos)
+            {
+                <tr>
+                    <td>@item.id</td>
+                    <td>@item.codigo</td>
+                    <td>@Model.Ejemplares(item)</td>
+                    <td>@item.fecha_inicio.ToString("dd/MM/yyyy")</td>
+                    <td>@item.fecha_fin.ToString("dd/MM/yyyy")</td>
+                    <td><span class="etiqueta @Model.ClaseSituacion(item)">@Model.Situacion(item)</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>Mis multas</h2>
+
+@if (Model.Multas.Count == 0)
+{
+    <p class="aviso">No tiene multas registradas.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Libro</th>
+                <th>Valor</th>
+                <th>Días atraso</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Multas)
+            {
+                <tr>
+                    <td>@item.id</td>
+                    <td>@item.Libro</td>
+                    <td>$ @item.Valor.ToString("N0")</td>
+                    <td>@item.Dias</td>
+                    <td>@item.Estado</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<p><a class="boton boton-claro" asp-page="/Index">Volver al inicio</a></p>

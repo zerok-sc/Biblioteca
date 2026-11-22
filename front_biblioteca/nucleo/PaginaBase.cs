@@ -11,6 +11,7 @@ namespace front_biblioteca.nucleo
 
         [BindProperty] public T Actual { get; set; } = new();
         [BindProperty] public int FiltroId { get; set; }
+        [BindProperty] public string? Buscar { get; set; }
         public List<T> Lista { get; set; } = new();
         public bool MostrarFormulario { get; set; }
         public Catalogos Catalogos { get; }
@@ -23,6 +24,22 @@ namespace front_biblioteca.nucleo
 
         private bool SoloLectura => User.IsInRole("LECTOR");
 
+        private static bool Coincide(T entidad, string texto)
+        {
+            foreach (var propiedad in typeof(T).GetProperties())
+            {
+                if (propiedad.PropertyType != typeof(string))
+                    continue;
+
+                var valor = propiedad.GetValue(entidad) as string;
+                if (!string.IsNullOrWhiteSpace(valor)
+                    && valor.Contains(texto, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
         public async Task OnGetAsync()
         {
             await CargarAsync();
@@ -33,9 +50,14 @@ namespace front_biblioteca.nucleo
             ViewData.Remove("Mensaje");
             try
             {
+                var todos = await presentacion.Consultar();
+                var texto = Buscar?.Trim();
+
                 Lista = FiltroId > 0
-                    ? await presentacion.Buscar(new T { id = FiltroId })
-                    : await presentacion.Consultar();
+                    ? todos.Where(x => x.id == FiltroId).ToList()
+                    : string.IsNullOrWhiteSpace(texto)
+                        ? todos
+                        : todos.Where(x => Coincide(x, texto!)).ToList();
             }
             catch (Exception ex)
             {
@@ -84,6 +106,14 @@ namespace front_biblioteca.nucleo
 
             try
             {
+                var error = await ValidarAsync();
+                if (error is not null)
+                {
+                    Avisar(error);
+                    await CargarAsync();
+                    return;
+                }
+
                 Actual = Actual.id == 0
                     ? await presentacion.Insertar(Actual)
                     : await presentacion.Actualizar(Actual);
@@ -124,6 +154,44 @@ namespace front_biblioteca.nucleo
         {
             ViewData.Remove("Mensaje");
             await CargarAsync();
+        }
+
+        private async Task<string?> ValidarAsync()
+        {
+            var propiedades = typeof(T).GetProperties();
+
+            var propiedadNombre = propiedades.FirstOrDefault(
+                x => x.Name == "nombre" && x.PropertyType == typeof(string));
+            if (propiedadNombre is not null)
+            {
+                var nombre = (propiedadNombre.GetValue(Actual) as string)?.Trim();
+                if (string.IsNullOrWhiteSpace(nombre))
+                    return "El nombre es obligatorio.";
+                propiedadNombre.SetValue(Actual, nombre);
+            }
+
+            var propiedadCodigo = propiedades.FirstOrDefault(
+                x => x.Name == "codigo" && x.PropertyType == typeof(string));
+            if (propiedadCodigo is not null)
+            {
+                var codigo = (propiedadCodigo.GetValue(Actual) as string)?.Trim();
+                if (string.IsNullOrWhiteSpace(codigo))
+                    return "El código es obligatorio.";
+
+                var todos = await presentacion.Consultar();
+                var repetido = todos.Any(x => x.id != Actual.id
+                    && string.Equals(
+                        propiedadCodigo.GetValue(x) as string,
+                        codigo,
+                        StringComparison.OrdinalIgnoreCase));
+
+                if (repetido)
+                    return "Ese código ya está registrado.";
+
+                propiedadCodigo.SetValue(Actual, codigo);
+            }
+
+            return null;
         }
 
         protected void Avisar(string mensaje)

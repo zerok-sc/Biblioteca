@@ -45,6 +45,7 @@ namespace servicios_biblioteca.Controllers
                 rol_codigo = usuario._rol?.codigo ?? "",
                 rol_nombre = usuario._rol?.nombre ?? "",
                 persona_nombre = usuario._persona?.nombre ?? "",
+                persona_id = usuario.persona,
                 imagen = usuario.foto is { Length: > 0 }
                     ? Convert.ToBase64String(usuario.foto)
                     : null,

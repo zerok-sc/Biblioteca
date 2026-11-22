@@ -31,6 +31,7 @@ namespace aplicaciones_libreria.nucleo
         public string rol_codigo { get; set; } = "";
         public string rol_nombre { get; set; } = "";
         public string persona_nombre { get; set; } = "";
+        public int persona_id { get; set; }
         public string? imagen { get; set; }
         public string? imagen_tipo { get; set; }
     }

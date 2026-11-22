@@ -11,5 +11,9 @@ namespace front_biblioteca.Pages.Ventanas
         public LibrosModel(IPresentacion<Libros> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
+
+        public int Disponibles(int libroId) =>
+            Catalogos.ListaEjemplares
+                .Count(x => x.libro == libroId && Catalogos.CodigoEstado(x.estado) == "DIS");
     }
 }

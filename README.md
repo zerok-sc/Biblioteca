@@ -80,7 +80,7 @@ biblioteca.sln
 |-----------------|------------------|---------------|--------|
 | `admin`         | `Biblioteca2026!` | ADMIN         | Todo el sistema |
 | `bibliotecario` | `biblio123`      | BIBLIO        | Catálogo y operaciones; sin Usuarios, Roles, Auditorías ni Sesiones |
-| `lector`        | `lector123`      | LECTOR        | Solo consultar el catálogo; sin botones de guardar/borrar |
+| `lector`        | `lector123`      | LECTOR        | Consultar el catálogo y ver sus préstamos/multas; sin botones de guardar/borrar |
 
 ## Cadena de conexión
 
@@ -172,9 +172,20 @@ historial del usuario seleccionado, filtros por texto y estado, y las acciones
 
 `Pages/Index.cshtml` funciona como tablero para ADMIN y BIBLIO: préstamos activos,
 atrasados, próximos vencimientos (3 días), ejemplares disponibles, multas
-pendientes, valor total de multas, libros más prestados y accesos rápidos a
-préstamos, multas y creación de usuarios. El rol LECTOR solo ve los totales del
-catálogo y los ejemplares disponibles.
+pendientes, valor total de multas y accesos rápidos a préstamos, multas y
+creación de usuarios. El rol LECTOR ve los totales del catálogo, los ejemplares
+disponibles y un enlace a **Mis préstamos**.
+
+## Ventana del lector
+
+`Pages/MisPrestamos.cshtml` está disponible solo para LECTOR. Muestra sus
+préstamos (código, ejemplares, fechas y situación), sus multas (libro, valor,
+días de atraso y estado) y un resumen de activos, atrasados, por vencer y valor
+de multas pendientes.
+
+La WebAPI devuelve `persona_id` en `DatosSesion` y el login lo guarda como
+`Claim`. La página filtra por esa persona, así que un LECTOR no puede ver
+préstamos ni multas de otra persona. No tiene handlers de escritura.
 
 ## Exportaciones y comprobantes
 
@@ -220,6 +231,14 @@ Los ids se mantienen en la base de datos, en las tablas y en los campos ocultos.
 Las columnas de llaves foráneas muestran nombres en lugar de números; así un
 ADMIN o BIBLIO elige **Alfaguara** o **Español** en lugar de tener que recordar
 que `3` es una editorial o `1` un idioma.
+
+El buscador de las ventanas acepta texto en vez de solo el id: con **Consultar**
+busca coincidencias en los campos de texto de cada entidad (código, nombre,
+apellido, etc.). En Libros se muestra además cuántos ejemplares están
+disponibles.
+
+Al guardar, `PaginaBase<T>` valida que `nombre` y `codigo` no queden vacíos y que
+el código no esté repetido. Los avisos salen en el mismo popup de mensajes.
 
 ## Migraciones
 

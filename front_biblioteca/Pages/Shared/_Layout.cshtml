@@ -25,6 +25,10 @@
                 {
                     <a asp-page="/CrearUsuario">Crear usuario</a>
                 }
+                @if (User.IsInRole("LECTOR"))
+                {
+                    <a asp-page="/MisPrestamos">Mis préstamos</a>
+                }
                 <a asp-page="/Perfil">Mi perfil</a>
                 <form method="post" asp-page="/Logout" style="display:inline">
                     <button class="boton boton-claro" type="submit">Salir</button>

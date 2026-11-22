@@ -56,6 +56,7 @@ namespace front_biblioteca.Pages
                 new(ClaimTypes.Role, datos.rol_codigo),
                 new("RolNombre", datos.rol_nombre),
                 new("PersonaNombre", datos.persona_nombre),
+                new("PersonaId", datos.persona_id.ToString()),
                 new("ImagenTipo", datos.imagen_tipo ?? "image/png")
             };
 

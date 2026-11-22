@@ -12,7 +12,7 @@
 }
 
 <form method="post" class="barra">
-    <input type="number" name="FiltroId" value="@Model.FiltroId" placeholder="Buscar por id" />
+    <input name="Buscar" value="@Model.Buscar" placeholder="Buscar por codigo o nombre" />
     <button class="boton" asp-page-handler="Consultar">Consultar</button>
     @if (!User.IsInRole("LECTOR"))
     {
@@ -53,6 +53,7 @@
             <th>Nombre</th>
             <th>Editorial</th>
             <th>Idioma</th>
+            <th>Disponibles</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -65,6 +66,7 @@
                 <td>@item.nombre</td>
                 <td>@Model.Catalogos.NombreEditorial(item.editorial)</td>
                 <td>@Model.Catalogos.NombreIdioma(item.idioma)</td>
+                <td>@Model.Disponibles(item.id)</td>
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />

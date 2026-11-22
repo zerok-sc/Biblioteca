@@ -12,7 +12,7 @@
 }
 
 <form method="post" class="barra">
-    <input type="number" name="FiltroId" value="@Model.FiltroId" placeholder="Buscar por id" />
+    <input name="Buscar" value="@Model.Buscar" placeholder="Buscar por codigo o nombre" />
     <button class="boton" asp-page-handler="Consultar">Consultar</button>
     @if (!User.IsInRole("LECTOR"))
     {
