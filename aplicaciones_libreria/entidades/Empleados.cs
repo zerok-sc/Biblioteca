@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace aplicaciones_libreria.entidades
 {
-    public class Empleados
+    public class Empleados : IEntidad
     {
         [Key] public int id { get; set; }
         public int persona { get; set; }

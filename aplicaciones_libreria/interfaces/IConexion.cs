@@ -28,8 +28,14 @@ namespace aplicaciones_libreria.interfaces
         DbSet<Multas>? Multas { get; set; }
         DbSet<Proveedores>? Proveedores { get; set; }
         DbSet<Compras>? Compras { get; set; }
+        DbSet<Roles>? Roles { get; set; }
+        DbSet<Usuarios>? Usuarios { get; set; }
+        DbSet<Sesiones>? Sesiones { get; set; }
+        DbSet<Auditorias>? Auditorias { get; set; }
 
+        DbSet<T> Set<T>() where T : class;
         EntityEntry<T> Entry<T>(T entity) where T : class;
         int SaveChanges();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

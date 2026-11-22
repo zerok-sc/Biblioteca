@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace aplicaciones_libreria.entidades
 {
-    public class Multas
+    public class Multas : IEntidad
     {
         [Key] public int id { get; set; }
         [Column(TypeName = "decimal(10,2)")] public decimal valor { get; set; }

@@ -5,7 +5,7 @@ Entity Framework Core como ORM y SQL Server como motor de datos.
 
 - **Materia:** Programación de Software
 - **Institución:** ITM
-- **Integrantes:** Santiago Carmona Zapata, Daniel Moncada Rodríguez, Juan José Gómez Jaramillo
+- **Integrante:** Santiago Carmona Zapata
 
 ## Estructura de la solución
 
@@ -14,9 +14,10 @@ biblioteca.sln
 │
 ├── aplicaciones_libreria/          Biblioteca de clases
 │   ├── Script.sql                  Creación de la base de datos y datos de ejemplo
-│   ├── entidades/                  20 clases, una por tabla
-│   ├── interfaces/IConexion.cs     Contrato de la conexión
-│   └── implementaciones/           Conexion.cs (DbContext)
+│   ├── entidades/                  24 clases, una por tabla
+│   ├── configuraciones/            Mapeo Fluent API de Roles, Usuarios, Sesiones y Auditorias
+│   ├── interfaces/                 IConexion e IRepository<T>
+│   └── implementaciones/           Conexion.cs (DbContext) y Repository<T>
 │
 ├── presentacion_consola/           Aplicación de consola
 │
@@ -27,7 +28,8 @@ biblioteca.sln
 
 - Visual Studio 2022 con el SDK de .NET 10
 - SQL Server (Express o Developer)
-- Paquetes NuGet: `Microsoft.EntityFrameworkCore.SqlServer 10.0.12`, `MSTest 4.0.1`
+- Paquetes NuGet: `Microsoft.EntityFrameworkCore.SqlServer 10.0.12`, `Microsoft.EntityFrameworkCore.Design 10.0.12`, `MSTest 4.0.1`
+- Herramienta CLI: `dotnet tool install --global dotnet-ef --version 10.0.12`
 
 ## Ejecución
 
@@ -48,6 +50,17 @@ server=localhost;database=biblioteca_db;Integrated Security=True;TrustServerCert
 
 Si el servidor se encuentra en otra instancia, reemplazar `localhost` por
 `localhost\SQLEXPRESS` o `.\SQLEXPRESS`.
+
+## Migraciones
+
+```
+dotnet tool install --global dotnet-ef --version 10.0.12
+dotnet ef migrations add InitialBiblioteca --project aplicaciones_libreria --startup-project presentacion_consola
+dotnet ef database update --project aplicaciones_libreria --startup-project presentacion_consola
+```
+
+`Script.sql` y las migraciones producen el mismo esquema de 24 tablas. Se usa uno
+u otro, no ambos sobre la misma base de datos.
 
 ## Pruebas
 

@@ -1,5 +1,7 @@
-﻿using aplicaciones_libreria.entidades;
+﻿using aplicaciones_libreria.configuraciones;
+using aplicaciones_libreria.entidades;
 using aplicaciones_libreria.interfaces;
+using aplicaciones_libreria.nucleo;
 using Microsoft.EntityFrameworkCore;
 
 namespace aplicaciones_libreria.implementaciones
@@ -8,10 +10,32 @@ namespace aplicaciones_libreria.implementaciones
     {
         public string? StringConexion { get; set; }
 
+        public Conexion()
+        {
+        }
+
+        public Conexion(DbContextOptions<Conexion> options) : base(options)
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(this.StringConexion!, p => { });
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(StringConexion ?? DatosGenerales.StringConexion());
+            }
+
             optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(Conexion).Assembly);
+
+            foreach (var llaveForanea in modelBuilder.Model.GetEntityTypes().SelectMany(x => x.GetForeignKeys()))
+            {
+                llaveForanea.DeleteBehavior = DeleteBehavior.Restrict;
+            }
         }
 
         public DbSet<Personas>? Personas { get; set; }
@@ -34,5 +58,9 @@ namespace aplicaciones_libreria.implementaciones
         public DbSet<Multas>? Multas { get; set; }
         public DbSet<Proveedores>? Proveedores { get; set; }
         public DbSet<Compras>? Compras { get; set; }
+        public DbSet<Roles>? Roles { get; set; }
+        public DbSet<Usuarios>? Usuarios { get; set; }
+        public DbSet<Sesiones>? Sesiones { get; set; }
+        public DbSet<Auditorias>? Auditorias { get; set; }
     }
 }

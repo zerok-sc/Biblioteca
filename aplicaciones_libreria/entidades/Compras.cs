@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace aplicaciones_libreria.entidades
 {
-    public class Compras
+    public class Compras : IEntidad
     {
         [Key] public int id { get; set; }
         public DateTime fecha { get; set; }

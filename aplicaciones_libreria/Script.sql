@@ -1,9 +1,7 @@
 /* ============================================================
    PROYECTO: BIBLIOTECA
    Materia: Programación de Software - ITM
-   Integrantes: Santiago Carmona Zapata
-                Daniel Moncada Rodríguez
-                Juan José Gómez Jaramillo */
+   Integrante: Santiago Carmona Zapata */
 
 USE master;
 GO
@@ -177,6 +175,51 @@ CREATE TABLE [Compras] (
     [proveedor] INT NOT NULL REFERENCES [Proveedores]([id]),
     [empleado] INT NOT NULL REFERENCES [Empleados]([id])
 );
+
+CREATE TABLE [Roles] (
+    [id] INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+    [nombre] NVARCHAR(50) NOT NULL,
+    [codigo] NVARCHAR(50) NOT NULL UNIQUE,
+    [descripcion] NVARCHAR(200) NULL,
+    [activo] BIT NOT NULL DEFAULT 1,
+    [fecha_creacion] SMALLDATETIME NOT NULL
+);
+
+CREATE TABLE [Usuarios] (
+    [id] INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+    [nombre_usuario] NVARCHAR(50) NOT NULL UNIQUE,
+    [correo] NVARCHAR(100) NOT NULL UNIQUE,
+    [password_hash] VARBINARY(32) NOT NULL,
+    [password_salt] VARBINARY(16) NOT NULL,
+    [rol] INT NOT NULL REFERENCES [Roles]([id]),
+    [persona] INT NOT NULL REFERENCES [Personas]([id]),
+    [activo] BIT NOT NULL DEFAULT 1,
+    [fecha_creacion] SMALLDATETIME NOT NULL,
+    [ultimo_acceso] SMALLDATETIME NULL
+);
+
+CREATE TABLE [Sesiones] (
+    [id] INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+    [usuario] INT NOT NULL REFERENCES [Usuarios]([id]),
+    [fecha_inicio] SMALLDATETIME NOT NULL,
+    [fecha_fin] SMALLDATETIME NULL,
+    [direccion_ip] NVARCHAR(50) NULL,
+    [agente_usuario] NVARCHAR(400) NULL,
+    [exitoso] BIT NOT NULL,
+    [motivo_fallo] NVARCHAR(200) NULL
+);
+
+CREATE TABLE [Auditorias] (
+    [id] INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+    [entidad] NVARCHAR(100) NOT NULL,
+    [entidad_id] INT NOT NULL,
+    [operacion] NVARCHAR(20) NOT NULL,
+    [fecha] SMALLDATETIME NOT NULL DEFAULT GETDATE(),
+    [valores_anteriores] NVARCHAR(MAX) NULL,
+    [valores_nuevos] NVARCHAR(MAX) NULL,
+    [nombre_usuario] NVARCHAR(50) NULL,
+    [direccion_ip] NVARCHAR(50) NULL
+);
 GO
 
 INSERT INTO [Personas] ([cedula], [nombre], [fecha_nacimiento], [telefono]) VALUES
@@ -192,6 +235,21 @@ INSERT INTO [Estados] ([nombre], [codigo], [descripcion], [fecha_creacion]) VALU
 ('Prestado',      'PRE', 'El ejemplar se encuentra prestado',         GETDATE()),
 ('Disponible',    'DIS', 'El ejemplar está disponible para préstamo', GETDATE()),
 ('Mantenimiento', 'MAN', 'El ejemplar está en reparación',            GETDATE());
+
+INSERT INTO [Roles] ([nombre], [codigo], [descripcion], [fecha_creacion]) VALUES
+('Administrador', 'ADMIN',  'Acceso total al sistema',          GETDATE()),
+('Bibliotecario', 'BIBLIO', 'Gestion de catalogo y prestamos',   GETDATE()),
+('Lector',        'LECTOR', 'Consulta del catalogo',             GETDATE());
+
+INSERT INTO [Usuarios]
+    ([nombre_usuario], [correo], [password_hash], [password_salt], [rol], [persona], [activo], [fecha_creacion])
+VALUES
+    ('admin', 'admin@biblioteca.com',
+     HASHBYTES('SHA2_256', 'Biblioteca2026!biblioteca-sal'),
+     CONVERT(VARBINARY(16), 'biblioteca-sal'),
+     (SELECT id FROM [Roles] WHERE codigo = 'ADMIN'),
+     (SELECT id FROM [Personas] WHERE cedula = '10101'),
+     1, GETDATE());
 
 INSERT INTO [Editoriales] ([nombre], [pais], [telefono], [correo]) VALUES
 ('Penguin Books',    'EE.UU.',   '6041234567', 'contacto@penguin.com'),
