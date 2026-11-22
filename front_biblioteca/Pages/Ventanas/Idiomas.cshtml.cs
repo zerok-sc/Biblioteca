@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize]
     public class IdiomasModel : PaginaBase<Idiomas>
     {
-        public IdiomasModel(IPresentacion<Idiomas> presentacion) : base(presentacion)
+        public IdiomasModel(IPresentacion<Idiomas> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

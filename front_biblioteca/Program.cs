@@ -1,3 +1,4 @@
+using front_biblioteca.nucleo;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using presentacion_libreria.implementaciones;
 using presentacion_libreria.interfaces;
@@ -8,6 +9,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<IComunicaciones, Comunicaciones>();
 builder.Services.AddScoped(typeof(IPresentacion<>), typeof(Presentacion<>));
 builder.Services.AddScoped<IAutenticacion, Autenticacion>();
+builder.Services.AddScoped<Catalogos>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(opciones =>

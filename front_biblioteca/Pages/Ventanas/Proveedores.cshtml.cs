@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize(Roles = "ADMIN,BIBLIO")]
     public class ProveedoresModel : PaginaBase<Proveedores>
     {
-        public ProveedoresModel(IPresentacion<Proveedores> presentacion) : base(presentacion)
+        public ProveedoresModel(IPresentacion<Proveedores> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

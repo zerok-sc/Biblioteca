@@ -27,8 +27,16 @@
         <div class="campos">
             <div><label>Codigo</label><input asp-for="Actual.codigo" /></div>
             <div><label>Nombre</label><input asp-for="Actual.nombre" /></div>
-            <div><label>Editorial</label><input asp-for="Actual.editorial" /></div>
-            <div><label>Idioma</label><input asp-for="Actual.idioma" /></div>
+            <div>
+                <label>Editorial</label>
+                <select asp-for="Actual.editorial" required asp-items="Model.Catalogos.OpcionesEditoriales">
+                </select>
+            </div>
+            <div>
+                <label>Idioma</label>
+                <select asp-for="Actual.idioma" required asp-items="Model.Catalogos.OpcionesIdiomas">
+                </select>
+            </div>
         </div>
         @if (!User.IsInRole("LECTOR"))
         {
@@ -40,7 +48,6 @@
 <table>
     <thead>
         <tr>
-            <th>id</th>
             <th>Codigo</th>
             <th>Nombre</th>
             <th>Editorial</th>
@@ -52,11 +59,10 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
-                <td>@item.id</td>
                 <td>@item.codigo</td>
                 <td>@item.nombre</td>
-                <td>@item.editorial</td>
-                <td>@item.idioma</td>
+                <td>@Model.Catalogos.NombreEditorial(item.editorial)</td>
+                <td>@Model.Catalogos.NombreIdioma(item.idioma)</td>
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />

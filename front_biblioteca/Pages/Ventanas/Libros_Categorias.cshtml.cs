@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize(Roles = "ADMIN,BIBLIO")]
     public class Libros_CategoriasModel : PaginaBase<Libros_Categorias>
     {
-        public Libros_CategoriasModel(IPresentacion<Libros_Categorias> presentacion) : base(presentacion)
+        public Libros_CategoriasModel(IPresentacion<Libros_Categorias> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

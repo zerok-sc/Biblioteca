@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize]
     public class UbicacionesModel : PaginaBase<Ubicaciones>
     {
-        public UbicacionesModel(IPresentacion<Ubicaciones> presentacion) : base(presentacion)
+        public UbicacionesModel(IPresentacion<Ubicaciones> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize(Roles = "ADMIN,BIBLIO")]
     public class MultasModel : PaginaBase<Multas>
     {
-        public MultasModel(IPresentacion<Multas> presentacion) : base(presentacion)
+        public MultasModel(IPresentacion<Multas> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

@@ -28,7 +28,11 @@
             <div><label>Nombre</label><input asp-for="Actual.nombre" /></div>
             <div><label>Descripcion</label><input asp-for="Actual.descripcion" /></div>
             <div><label>Codigo</label><input asp-for="Actual.codigo" /></div>
-            <div><label>Estado</label><input asp-for="Actual.estado" /></div>
+            <div>
+                <label>Estado</label>
+                <select asp-for="Actual.estado" required asp-items="Model.Catalogos.OpcionesEstados">
+                </select>
+            </div>
         </div>
         @if (!User.IsInRole("LECTOR"))
         {
@@ -40,7 +44,6 @@
 <table>
     <thead>
         <tr>
-            <th>id</th>
             <th>Nombre</th>
             <th>Descripcion</th>
             <th>Codigo</th>
@@ -52,11 +55,10 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
-                <td>@item.id</td>
                 <td>@item.nombre</td>
                 <td>@item.descripcion</td>
                 <td>@item.codigo</td>
-                <td>@item.estado</td>
+                <td>@Model.Catalogos.NombreEstado(item.estado)</td>
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />

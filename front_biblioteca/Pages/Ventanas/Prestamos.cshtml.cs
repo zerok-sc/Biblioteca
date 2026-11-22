@@ -3,7 +3,6 @@ using aplicaciones_libreria.entidades;
 using front_biblioteca.nucleo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using presentacion_libreria.interfaces;
 
 namespace front_biblioteca.Pages.Ventanas
@@ -11,13 +10,6 @@ namespace front_biblioteca.Pages.Ventanas
     [Authorize(Roles = "ADMIN,BIBLIO")]
     public class PrestamosModel : PaginaBase<Prestamos>
     {
-        private readonly IPresentacion<Personas> personas;
-        private readonly IPresentacion<Empleados> empleados;
-        private readonly IPresentacion<Estados> estados;
-
-        public List<Personas> ListaPersonas { get; set; } = new();
-        public List<Empleados> ListaEmpleados { get; set; } = new();
-        public List<Estados> ListaEstados { get; set; } = new();
         public List<Personas> Coincidencias { get; set; } = new();
 
         [BindProperty] public string? BuscarNombre { get; set; }
@@ -31,59 +23,38 @@ namespace front_biblioteca.Pages.Ventanas
         public string NombrePersonaSeleccionada =>
             PersonaSeleccionada == 0 ? "Ninguno" : NombrePersona(PersonaSeleccionada);
 
-        public List<SelectListItem> OpcionesEmpleados =>
-            ListaEmpleados.Select(x => new SelectListItem
-            {
-                Value = x.id.ToString(),
-                Text = $"{NombrePersona(x.persona)} ({x.cargo})"
-            }).ToList();
-
         public List<Estados> EstadosPrestamo
         {
             get
             {
-                var lista = ListaEstados
+                var lista = Catalogos.ListaEstados
                     .Where(x => x.codigo == "PRE" || x.codigo == "DEV" || x.codigo == "ATR")
                     .ToList();
 
-                return lista.Count > 0 ? lista : ListaEstados;
+                return lista.Count > 0 ? lista : Catalogos.ListaEstados;
             }
         }
 
         public PrestamosModel(
             IPresentacion<Prestamos> presentacion,
-            IPresentacion<Personas> personas,
-            IPresentacion<Empleados> empleados,
-            IPresentacion<Estados> estados) : base(presentacion)
+            Catalogos catalogos) : base(presentacion, catalogos)
         {
-            this.personas = personas;
-            this.empleados = empleados;
-            this.estados = estados;
         }
 
-        protected override async Task CargarCatalogosAsync()
+        protected override Task CargarCatalogosAsync()
         {
-            try
+            if (EstadoSeleccionado == 0)
             {
-                ListaPersonas = await personas.Consultar();
-                ListaEmpleados = await empleados.Consultar();
-                ListaEstados = await estados.Consultar();
-
-                if (EstadoSeleccionado == 0)
-                {
-                    EstadoSeleccionado = ListaEstados
-                        .FirstOrDefault(x => x.codigo == "PRE")?.id
-                        ?? ListaEstados.FirstOrDefault()?.id
-                        ?? 0;
-                }
-
-                if (EmpleadoSeleccionado == 0)
-                    EmpleadoSeleccionado = ListaEmpleados.FirstOrDefault()?.id ?? 0;
+                EstadoSeleccionado = Catalogos.ListaEstados
+                    .FirstOrDefault(x => x.codigo == "PRE")?.id
+                    ?? Catalogos.ListaEstados.FirstOrDefault()?.id
+                    ?? 0;
             }
-            catch (Exception ex)
-            {
-                LogConversor.Log(ex, ViewData);
-            }
+
+            if (EmpleadoSeleccionado == 0)
+                EmpleadoSeleccionado = Catalogos.ListaEmpleados.FirstOrDefault()?.id ?? 0;
+
+            return Task.CompletedTask;
         }
 
         public async Task<IActionResult> OnPostBuscarAsync()
@@ -93,7 +64,7 @@ namespace front_biblioteca.Pages.Ventanas
             var texto = BuscarNombre?.Trim() ?? "";
             Coincidencias = string.IsNullOrWhiteSpace(texto)
                 ? new List<Personas>()
-                : ListaPersonas
+                : Catalogos.ListaPersonas
                     .Where(x => Contiene(x.nombre, texto) || Contiene(x.cedula, texto))
                     .Take(20)
                     .ToList();
@@ -107,7 +78,7 @@ namespace front_biblioteca.Pages.Ventanas
         {
             await base.OnGetAsync();
 
-            var persona = ListaPersonas.FirstOrDefault(x => x.id == personaId);
+            var persona = Catalogos.ListaPersonas.FirstOrDefault(x => x.id == personaId);
             if (persona is null)
             {
                 Avisar("Seleccione un usuario válido.");
@@ -128,15 +99,15 @@ namespace front_biblioteca.Pages.Ventanas
 
             try
             {
-                var persona = ListaPersonas.FirstOrDefault(x => x.id == PersonaSeleccionada);
+                var persona = Catalogos.ListaPersonas.FirstOrDefault(x => x.id == PersonaSeleccionada);
                 if (persona is null)
                     throw new InvalidOperationException("Primero busque y seleccione el usuario del préstamo.");
 
-                var empleado = ListaEmpleados.FirstOrDefault(x => x.id == EmpleadoSeleccionado);
+                var empleado = Catalogos.ListaEmpleados.FirstOrDefault(x => x.id == EmpleadoSeleccionado);
                 if (empleado is null)
                     throw new InvalidOperationException("Seleccione el empleado que registra el préstamo.");
 
-                var estado = ListaEstados.FirstOrDefault(x => x.id == EstadoSeleccionado);
+                var estado = Catalogos.ListaEstados.FirstOrDefault(x => x.id == EstadoSeleccionado);
                 if (estado is null)
                     throw new InvalidOperationException("Seleccione un estado válido.");
 
@@ -193,22 +164,10 @@ namespace front_biblioteca.Pages.Ventanas
                 valor, texto, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0;
         }
 
-        public string NombrePersona(int id)
-        {
-            return ListaPersonas.FirstOrDefault(x => x.id == id)?.nombre ?? $"Persona {id}";
-        }
+        public string NombrePersona(int id) => Catalogos.NombrePersona(id);
 
-        public string NombreEmpleado(int id)
-        {
-            var empleado = ListaEmpleados.FirstOrDefault(x => x.id == id);
-            return empleado is null
-                ? $"Empleado {id}"
-                : $"{NombrePersona(empleado.persona)} ({empleado.cargo})";
-        }
+        public string NombreEmpleado(int id) => Catalogos.NombreEmpleado(id);
 
-        public string NombreEstado(int id)
-        {
-            return ListaEstados.FirstOrDefault(x => x.id == id)?.nombre ?? $"Estado {id}";
-        }
+        public string NombreEstado(int id) => Catalogos.NombreEstado(id);
     }
 }

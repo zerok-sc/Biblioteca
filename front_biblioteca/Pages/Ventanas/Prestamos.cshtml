@@ -87,7 +87,7 @@
             </div>
             <div>
                 <label>Empleado que registra</label>
-                <select asp-for="EmpleadoSeleccionado" asp-items="Model.OpcionesEmpleados">
+                <select asp-for="EmpleadoSeleccionado" asp-items="Model.Catalogos.OpcionesEmpleados">
                 </select>
             </div>
         </div>
@@ -103,7 +103,6 @@
 <table>
     <thead>
         <tr>
-            <th>id</th>
             <th>Código</th>
             <th>Usuario</th>
             <th>Empleado</th>
@@ -118,7 +117,6 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
-                <td>@item.id</td>
                 <td>@item.codigo</td>
                 <td>@Model.NombrePersona(item.persona)</td>
                 <td>@Model.NombreEmpleado(item.empleado)</td>

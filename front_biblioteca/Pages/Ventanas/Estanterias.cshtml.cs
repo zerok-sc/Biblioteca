@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize]
     public class EstanteriasModel : PaginaBase<Estanterias>
     {
-        public EstanteriasModel(IPresentacion<Estanterias> presentacion) : base(presentacion)
+        public EstanteriasModel(IPresentacion<Estanterias> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

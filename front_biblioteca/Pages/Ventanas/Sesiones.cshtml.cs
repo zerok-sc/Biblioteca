@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize(Roles = "ADMIN")]
     public class SesionesModel : PaginaBase<Sesiones>
     {
-        public SesionesModel(IPresentacion<Sesiones> presentacion) : base(presentacion)
+        public SesionesModel(IPresentacion<Sesiones> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

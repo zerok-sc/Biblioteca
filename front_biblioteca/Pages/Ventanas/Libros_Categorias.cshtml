@@ -25,10 +25,22 @@
     <form method="post">
         <input type="hidden" asp-for="Actual.id" />
         <div class="campos">
-            <div><label>Libro</label><input asp-for="Actual.libro" /></div>
-            <div><label>Categoria</label><input asp-for="Actual.categoria" /></div>
+            <div>
+                <label>Libro</label>
+                <select asp-for="Actual.libro" required asp-items="Model.Catalogos.OpcionesLibros">
+                </select>
+            </div>
+            <div>
+                <label>Categoria</label>
+                <select asp-for="Actual.categoria" required asp-items="Model.Catalogos.OpcionesCategorias">
+                </select>
+            </div>
             <div><label>Fecha asignacion</label><input asp-for="Actual.fecha_asignacion" /></div>
-            <div><label>Estado</label><input asp-for="Actual.estado" /></div>
+            <div>
+                <label>Estado</label>
+                <select asp-for="Actual.estado" required asp-items="Model.Catalogos.OpcionesEstados">
+                </select>
+            </div>
         </div>
         @if (!User.IsInRole("LECTOR"))
         {
@@ -40,7 +52,6 @@
 <table>
     <thead>
         <tr>
-            <th>id</th>
             <th>Libro</th>
             <th>Categoria</th>
             <th>Fecha asignacion</th>
@@ -52,11 +63,10 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
-                <td>@item.id</td>
-                <td>@item.libro</td>
-                <td>@item.categoria</td>
+                <td>@Model.Catalogos.NombreLibro(item.libro)</td>
+                <td>@Model.Catalogos.NombreCategoria(item.categoria)</td>
                 <td>@item.fecha_asignacion</td>
-                <td>@item.estado</td>
+                <td>@Model.Catalogos.NombreEstado(item.estado)</td>
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />

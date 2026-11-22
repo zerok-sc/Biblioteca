@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize(Roles = "ADMIN,BIBLIO")]
     public class EstadosModel : PaginaBase<Estados>
     {
-        public EstadosModel(IPresentacion<Estados> presentacion) : base(presentacion)
+        public EstadosModel(IPresentacion<Estados> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

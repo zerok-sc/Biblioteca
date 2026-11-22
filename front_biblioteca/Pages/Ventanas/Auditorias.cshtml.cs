@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize(Roles = "ADMIN")]
     public class AuditoriasModel : PaginaBase<Auditorias>
     {
-        public AuditoriasModel(IPresentacion<Auditorias> presentacion) : base(presentacion)
+        public AuditoriasModel(IPresentacion<Auditorias> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

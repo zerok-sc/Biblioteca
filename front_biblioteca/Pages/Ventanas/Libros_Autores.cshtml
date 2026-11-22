@@ -25,8 +25,16 @@
     <form method="post">
         <input type="hidden" asp-for="Actual.id" />
         <div class="campos">
-            <div><label>Libro</label><input asp-for="Actual.libro" /></div>
-            <div><label>Autor</label><input asp-for="Actual.autor" /></div>
+            <div>
+                <label>Libro</label>
+                <select asp-for="Actual.libro" required asp-items="Model.Catalogos.OpcionesLibros">
+                </select>
+            </div>
+            <div>
+                <label>Autor</label>
+                <select asp-for="Actual.autor" required asp-items="Model.Catalogos.OpcionesAutores">
+                </select>
+            </div>
             <div><label>Tipo participacion</label><input asp-for="Actual.tipo_participacion" /></div>
             <div><label>Fecha registro</label><input asp-for="Actual.fecha_registro" /></div>
         </div>
@@ -40,7 +48,6 @@
 <table>
     <thead>
         <tr>
-            <th>id</th>
             <th>Libro</th>
             <th>Autor</th>
             <th>Tipo participacion</th>
@@ -52,9 +59,8 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
-                <td>@item.id</td>
-                <td>@item.libro</td>
-                <td>@item.autor</td>
+                <td>@Model.Catalogos.NombreLibro(item.libro)</td>
+                <td>@Model.Catalogos.NombreAutor(item.autor)</td>
                 <td>@item.tipo_participacion</td>
                 <td>@item.fecha_registro</td>
                 <td>

@@ -25,7 +25,11 @@
     <form method="post">
         <input type="hidden" asp-for="Actual.id" />
         <div class="campos">
-            <div><label>Usuario</label><input asp-for="Actual.usuario" /></div>
+            <div>
+                <label>Usuario</label>
+                <select asp-for="Actual.usuario" required asp-items="Model.Catalogos.OpcionesUsuarios">
+                </select>
+            </div>
             <div><label>Fecha inicio</label><input asp-for="Actual.fecha_inicio" /></div>
             <div><label>Fecha fin</label><input asp-for="Actual.fecha_fin" /></div>
             <div><label>Direccion ip</label><input asp-for="Actual.direccion_ip" /></div>
@@ -43,7 +47,6 @@
 <table>
     <thead>
         <tr>
-            <th>id</th>
             <th>Usuario</th>
             <th>Fecha inicio</th>
             <th>Fecha fin</th>
@@ -58,8 +61,7 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
-                <td>@item.id</td>
-                <td>@item.usuario</td>
+                <td>@Model.Catalogos.NombreUsuario(item.usuario)</td>
                 <td>@item.fecha_inicio</td>
                 <td>@item.fecha_fin</td>
                 <td>@item.direccion_ip</td>

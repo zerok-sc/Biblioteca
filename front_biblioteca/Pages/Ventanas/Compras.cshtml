@@ -27,8 +27,16 @@
         <div class="campos">
             <div><label>Fecha</label><input asp-for="Actual.fecha" /></div>
             <div><label>Total</label><input asp-for="Actual.total" /></div>
-            <div><label>Proveedor</label><input asp-for="Actual.proveedor" /></div>
-            <div><label>Empleado</label><input asp-for="Actual.empleado" /></div>
+            <div>
+                <label>Proveedor</label>
+                <select asp-for="Actual.proveedor" required asp-items="Model.Catalogos.OpcionesProveedores">
+                </select>
+            </div>
+            <div>
+                <label>Empleado</label>
+                <select asp-for="Actual.empleado" required asp-items="Model.Catalogos.OpcionesEmpleados">
+                </select>
+            </div>
         </div>
         @if (!User.IsInRole("LECTOR"))
         {
@@ -40,7 +48,6 @@
 <table>
     <thead>
         <tr>
-            <th>id</th>
             <th>Fecha</th>
             <th>Total</th>
             <th>Proveedor</th>
@@ -52,11 +59,10 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
-                <td>@item.id</td>
                 <td>@item.fecha</td>
                 <td>@item.total</td>
-                <td>@item.proveedor</td>
-                <td>@item.empleado</td>
+                <td>@Model.Catalogos.NombreProveedor(item.proveedor)</td>
+                <td>@Model.Catalogos.NombreEmpleado(item.empleado)</td>
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />

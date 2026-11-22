@@ -148,6 +148,17 @@ con la fecha de inicio y el tiempo. La tabla `Prestamos` guarda `tiempo`,
 `fecha_inicio`, `fecha_fin` y `estado` (llave foránea a `Estados`), además de la
 persona y el empleado. El rol LECTOR no puede entrar a esta página.
 
+## Nombres en lugar de ids
+
+`front_biblioteca/nucleo/Catalogos.cs` carga los catálogos que usan las ventanas.
+Las tablas muestran `NombreEditorial`, `NombreIdioma`, `NombrePersona`,
+`NombreEstado`, etc., y los formularios usan listas desplegables con
+`OpcionesEditoriales`, `OpcionesIdiomas`, `OpcionesPersonas`, etc.
+
+Los ids siguen existiendo en la base de datos y en los campos ocultos, pero ya no
+se muestran como columnas. Así un ADMIN o BIBLIO elige **Alfaguara** o **Español**
+en lugar de tener que recordar que `3` es una editorial o `1` un idioma.
+
 ## Migraciones
 
 ```

@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize(Roles = "ADMIN,BIBLIO")]
     public class Prestamos_LibrosModel : PaginaBase<Prestamos_Libros>
     {
-        public Prestamos_LibrosModel(IPresentacion<Prestamos_Libros> presentacion) : base(presentacion)
+        public Prestamos_LibrosModel(IPresentacion<Prestamos_Libros> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

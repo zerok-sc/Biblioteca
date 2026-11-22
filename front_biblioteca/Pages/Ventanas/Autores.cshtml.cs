@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize]
     public class AutoresModel : PaginaBase<Autores>
     {
-        public AutoresModel(IPresentacion<Autores> presentacion) : base(presentacion)
+        public AutoresModel(IPresentacion<Autores> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

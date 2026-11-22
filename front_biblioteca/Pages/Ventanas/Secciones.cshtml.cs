@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize]
     public class SeccionesModel : PaginaBase<Secciones>
     {
-        public SeccionesModel(IPresentacion<Secciones> presentacion) : base(presentacion)
+        public SeccionesModel(IPresentacion<Secciones> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

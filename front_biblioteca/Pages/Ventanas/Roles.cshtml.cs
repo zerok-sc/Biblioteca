@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize(Roles = "ADMIN")]
     public class RolesModel : PaginaBase<Roles>
     {
-        public RolesModel(IPresentacion<Roles> presentacion) : base(presentacion)
+        public RolesModel(IPresentacion<Roles> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

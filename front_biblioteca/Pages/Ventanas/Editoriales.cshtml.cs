@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize]
     public class EditorialesModel : PaginaBase<Editoriales>
     {
-        public EditorialesModel(IPresentacion<Editoriales> presentacion) : base(presentacion)
+        public EditorialesModel(IPresentacion<Editoriales> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

@@ -8,7 +8,7 @@ namespace front_biblioteca.Pages.Ventanas
 [Authorize(Roles = "ADMIN,BIBLIO")]
     public class EmpleadosModel : PaginaBase<Empleados>
     {
-        public EmpleadosModel(IPresentacion<Empleados> presentacion) : base(presentacion)
+        public EmpleadosModel(IPresentacion<Empleados> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
         {
         }
     }

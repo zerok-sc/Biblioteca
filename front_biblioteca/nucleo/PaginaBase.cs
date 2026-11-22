@@ -13,10 +13,12 @@ namespace front_biblioteca.nucleo
         [BindProperty] public int FiltroId { get; set; }
         public List<T> Lista { get; set; } = new();
         public bool MostrarFormulario { get; set; }
+        public Catalogos Catalogos { get; }
 
-        protected PaginaBase(IPresentacion<T> presentacion)
+        protected PaginaBase(IPresentacion<T> presentacion, Catalogos catalogos)
         {
             this.presentacion = presentacion;
+            Catalogos = catalogos;
         }
 
         private bool SoloLectura => User.IsInRole("LECTOR");
@@ -39,6 +41,8 @@ namespace front_biblioteca.nucleo
             {
                 LogConversor.Log(ex, ViewData);
             }
+
+            await CargarCatalogosSeguroAsync();
         }
 
         public async Task OnPostNuevoAsync()
@@ -46,6 +50,7 @@ namespace front_biblioteca.nucleo
             if (SoloLectura)
             {
                 Avisar("El rol Lector solo puede consultar.");
+                await CargarAsync();
                 return;
             }
 
@@ -59,6 +64,7 @@ namespace front_biblioteca.nucleo
             if (SoloLectura)
             {
                 Avisar("El rol Lector solo puede consultar.");
+                await CargarAsync();
                 return;
             }
 
@@ -72,6 +78,7 @@ namespace front_biblioteca.nucleo
             if (SoloLectura)
             {
                 Avisar("El rol Lector solo puede consultar.");
+                await CargarAsync();
                 return;
             }
 
@@ -96,6 +103,7 @@ namespace front_biblioteca.nucleo
             if (SoloLectura)
             {
                 Avisar("El rol Lector solo puede consultar.");
+                await CargarAsync();
                 return;
             }
 
@@ -133,12 +141,26 @@ namespace front_biblioteca.nucleo
             try
             {
                 Lista = await presentacion.Consultar();
-                await CargarCatalogosAsync();
             }
             catch (Exception ex)
             {
                 LogConversor.Log(new Exception("No se pudo consultar la WebAPI: " + ex.Message), ViewData);
                 Lista = new List<T>();
+            }
+
+            await CargarCatalogosSeguroAsync();
+            await CargarCatalogosAsync();
+        }
+
+        private async Task CargarCatalogosSeguroAsync()
+        {
+            try
+            {
+                await Catalogos.CargarAsync();
+            }
+            catch (Exception ex)
+            {
+                LogConversor.Log(new Exception("No se pudieron cargar los catálogos: " + ex.Message), ViewData);
             }
         }
     }

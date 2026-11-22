@@ -25,9 +25,21 @@
     <form method="post">
         <input type="hidden" asp-for="Actual.id" />
         <div class="campos">
-            <div><label>Prestamo</label><input asp-for="Actual.prestamo" /></div>
-            <div><label>Ejemplar</label><input asp-for="Actual.ejemplar" /></div>
-            <div><label>Estado</label><input asp-for="Actual.estado" /></div>
+            <div>
+                <label>Prestamo</label>
+                <select asp-for="Actual.prestamo" required asp-items="Model.Catalogos.OpcionesPrestamos">
+                </select>
+            </div>
+            <div>
+                <label>Ejemplar</label>
+                <select asp-for="Actual.ejemplar" required asp-items="Model.Catalogos.OpcionesEjemplares">
+                </select>
+            </div>
+            <div>
+                <label>Estado</label>
+                <select asp-for="Actual.estado" required asp-items="Model.Catalogos.OpcionesEstados">
+                </select>
+            </div>
             <div><label>Fecha</label><input asp-for="Actual.fecha" /></div>
         </div>
         @if (!User.IsInRole("LECTOR"))
@@ -40,7 +52,6 @@
 <table>
     <thead>
         <tr>
-            <th>id</th>
             <th>Prestamo</th>
             <th>Ejemplar</th>
             <th>Estado</th>
@@ -52,10 +63,9 @@
         @foreach (var item in Model.Lista)
         {
             <tr>
-                <td>@item.id</td>
-                <td>@item.prestamo</td>
-                <td>@item.ejemplar</td>
-                <td>@item.estado</td>
+                <td>@Model.Catalogos.NombrePrestamo(item.prestamo)</td>
+                <td>@Model.Catalogos.NombreEjemplar(item.ejemplar)</td>
+                <td>@Model.Catalogos.NombreEstado(item.estado)</td>
                 <td>@item.fecha</td>
                 <td>
                     <form method="post" style="display:inline">
