@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace front_biblioteca.Pages
 {
-    [Authorize(Roles = "ADMIN,BIBLIO")]
+    [Authorize(Roles = Codigos.RolesOperador)]
     public class ComprobanteModel : PageModel
     {
         private readonly Catalogos catalogos;

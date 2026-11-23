@@ -45,7 +45,7 @@
     <p>
         <a class="boton" asp-page="/Ventanas/Prestamos">Registrar préstamo</a>
         <a class="boton boton-claro" asp-page="/Ventanas/Multas">Ver multas</a>
-        @if (User.IsInRole("ADMIN"))
+        @if (User.IsInRole(Codigos.RolAdmin))
         {
             <a class="boton boton-claro" asp-page="/CrearUsuario">Crear usuario</a>
         }

@@ -6,7 +6,7 @@ using presentacion_libreria.interfaces;
 
 namespace front_biblioteca.Pages.Ventanas
 {
-    [Authorize(Roles = "ADMIN,BIBLIO")]
+    [Authorize(Roles = Codigos.RolesOperador)]
     public class MultasModel : PaginaBase<Multas>
     {
         public MultasModel(IPresentacion<Multas> presentacion, Catalogos catalogos)
@@ -24,7 +24,7 @@ namespace front_biblioteca.Pages.Ventanas
             Catalogos.DiasAtrasoDeMulta(multa);
 
         public bool EsPagada(Multas multa) =>
-            Catalogos.CodigoEstado(multa.estado) == "PAG";
+            Catalogos.CodigoEstado(multa.estado) == Codigos.EstadoPagada;
 
         public async Task<IActionResult> OnGetExportarAsync()
         {
@@ -57,10 +57,10 @@ namespace front_biblioteca.Pages.Ventanas
                 var multa = Catalogos.ListaMultas.FirstOrDefault(x => x.id == id)
                     ?? throw new InvalidOperationException("La multa no existe.");
 
-                if (Catalogos.CodigoEstado(multa.estado) == "PAG")
+                if (Catalogos.CodigoEstado(multa.estado) == Codigos.EstadoPagada)
                     throw new InvalidOperationException("Esa multa ya está pagada.");
 
-                var estadoPagada = Catalogos.IdEstado("PAG");
+                var estadoPagada = Catalogos.IdEstado(Codigos.EstadoPagada);
                 if (estadoPagada == 0)
                     throw new InvalidOperationException("No existe el estado Pagada en la base de datos.");
 

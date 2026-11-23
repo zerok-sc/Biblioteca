@@ -6,7 +6,7 @@ using presentacion_libreria.interfaces;
 
 namespace front_biblioteca.Pages.Ventanas
 {
-    [Authorize(Roles = "ADMIN,BIBLIO")]
+    [Authorize(Roles = Codigos.RolesOperador)]
     public class ComprasModel : PaginaBase<Compras>
     {
         private readonly IPresentacion<Compras_Libros> detalles;
@@ -64,7 +64,7 @@ namespace front_biblioteca.Pages.Ventanas
 
         public async Task<IActionResult> OnPostGuardarCompraAsync()
         {
-            if (User.IsInRole("LECTOR"))
+            if (User.IsInRole(Codigos.RolLector))
             {
                 Avisar("El rol Lector solo puede consultar.");
                 await RecargarAsync();
@@ -109,7 +109,7 @@ namespace front_biblioteca.Pages.Ventanas
                 return Page();
             }
 
-            var estadoDisponible = Catalogos.IdEstado("DIS");
+            var estadoDisponible = Catalogos.IdEstado(Codigos.EstadoDisponible);
             if (estadoDisponible == 0)
             {
                 Avisar("No existe el estado Disponible en la base de datos.");
@@ -202,7 +202,7 @@ namespace front_biblioteca.Pages.Ventanas
 
         public async Task<IActionResult> OnPostBorrarCompraAsync(int id)
         {
-            if (User.IsInRole("LECTOR"))
+            if (User.IsInRole(Codigos.RolLector))
             {
                 Avisar("El rol Lector solo puede consultar.");
                 await RecargarAsync();
@@ -228,7 +228,7 @@ namespace front_biblioteca.Pages.Ventanas
                     return Page();
                 }
 
-                var estadoDisponible = Catalogos.IdEstado("DIS");
+                var estadoDisponible = Catalogos.IdEstado(Codigos.EstadoDisponible);
                 if (estadoDisponible > 0)
                 {
                     foreach (var copia in copias.Where(x => x.estado != estadoDisponible))

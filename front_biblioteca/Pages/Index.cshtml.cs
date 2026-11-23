@@ -23,7 +23,7 @@ namespace front_biblioteca.Pages
         public string? Imagen { get; private set; }
         public string TipoImagen { get; private set; } = "image/png";
 
-        public bool EsOperador => User.IsInRole("ADMIN") || User.IsInRole("BIBLIO");
+        public bool EsOperador => User.IsInRole(Codigos.RolAdmin) || User.IsInRole(Codigos.RolBibliotecario);
 
         public int TotalLibros { get; private set; }
         public int TotalAutores { get; private set; }
@@ -47,10 +47,10 @@ namespace front_biblioteca.Pages
 
         public bool PuedeVer(string entidad)
         {
-            if (User.IsInRole("ADMIN"))
+            if (User.IsInRole(Codigos.RolAdmin))
                 return true;
 
-            if (User.IsInRole("BIBLIO"))
+            if (User.IsInRole(Codigos.RolBibliotecario))
                 return !Seguridad.Contains(entidad);
 
             return Catalogo.Contains(entidad);
@@ -75,10 +75,10 @@ namespace front_biblioteca.Pages
                 PrestamosPorVencer = catalogos.ListaPrestamos.Count(EstaPorVencer);
 
                 EjemplaresDisponibles = catalogos.ListaEjemplares
-                    .Count(x => catalogos.CodigoEstado(x.estado) == "DIS");
+                    .Count(x => catalogos.CodigoEstado(x.estado) == Codigos.EstadoDisponible);
 
                 var multasActivas = catalogos.ListaMultas
-                    .Where(x => catalogos.CodigoEstado(x.estado) == "ACT")
+                    .Where(x => catalogos.CodigoEstado(x.estado) == Codigos.EstadoActivo)
                     .ToList();
 
                 MultasPendientes = multasActivas.Count;

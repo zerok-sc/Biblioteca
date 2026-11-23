@@ -6,4 +6,8 @@
 
 <h1>Algo salió mal</h1>
 <p>@Model.Mensaje</p>
+@if (!string.IsNullOrEmpty(Model.Referencia))
+{
+    <p class="ayuda">Referencia: @Model.Referencia</p>
+}
 <a asp-page="/Index" class="boton">Volver al inicio</a>

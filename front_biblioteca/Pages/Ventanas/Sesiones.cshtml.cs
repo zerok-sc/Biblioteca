@@ -5,7 +5,7 @@ using presentacion_libreria.interfaces;
 
 namespace front_biblioteca.Pages.Ventanas
 {
-[Authorize(Roles = "ADMIN")]
+[Authorize(Roles = Codigos.RolAdmin)]
     public class SesionesModel : PaginaBase<Sesiones>
     {
         public SesionesModel(IPresentacion<Sesiones> presentacion, Catalogos catalogos) : base(presentacion, catalogos)

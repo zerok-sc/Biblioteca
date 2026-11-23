@@ -37,6 +37,6 @@ namespace front_biblioteca.Pages.Ventanas
 
         public int Disponibles(int libroId) =>
             Catalogos.ListaEjemplares
-                .Count(x => x.libro == libroId && Catalogos.CodigoEstado(x.estado) == "DIS");
+                .Count(x => x.libro == libroId && Catalogos.CodigoEstado(x.estado) == Codigos.EstadoDisponible);
     }
 }

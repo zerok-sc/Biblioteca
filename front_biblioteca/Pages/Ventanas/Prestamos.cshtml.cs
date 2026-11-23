@@ -7,7 +7,7 @@ using presentacion_libreria.interfaces;
 
 namespace front_biblioteca.Pages.Ventanas
 {
-    [Authorize(Roles = "ADMIN,BIBLIO")]
+    [Authorize(Roles = Codigos.RolesOperador)]
     public class PrestamosModel : PaginaBase<Prestamos>
     {
         private const decimal ValorMultaPorDia = 2000m;
@@ -38,7 +38,7 @@ namespace front_biblioteca.Pages.Ventanas
 
         public List<Ejemplares> EjemplaresDisponibles =>
             Catalogos.ListaEjemplares
-                .Where(x => Catalogos.CodigoEstado(x.estado) == "DIS")
+                .Where(x => Catalogos.CodigoEstado(x.estado) == Codigos.EstadoDisponible)
                 .OrderBy(x => Catalogos.NombreLibro(x.libro))
                 .ThenBy(x => x.codigo)
                 .ToList();
@@ -91,7 +91,7 @@ namespace front_biblioteca.Pages.Ventanas
             get
             {
                 var lista = Catalogos.ListaEstados
-                    .Where(x => x.codigo == "PRE" || x.codigo == "ATR")
+                    .Where(x => x.codigo == Codigos.EstadoPrestado || x.codigo == Codigos.EstadoAtrasado)
                     .ToList();
 
                 return lista.Count > 0 ? lista : Catalogos.ListaEstados;
@@ -114,7 +114,7 @@ namespace front_biblioteca.Pages.Ventanas
         {
             if (EstadoSeleccionado == 0)
             {
-                EstadoSeleccionado = Catalogos.IdEstado("PRE");
+                EstadoSeleccionado = Catalogos.IdEstado(Codigos.EstadoPrestado);
                 if (EstadoSeleccionado == 0)
                     EstadoSeleccionado = Catalogos.ListaEstados.FirstOrDefault()?.id ?? 0;
             }
@@ -202,7 +202,7 @@ namespace front_biblioteca.Pages.Ventanas
                     throw new InvalidOperationException("Seleccione al menos un ejemplar disponible.");
 
                 var disponibles = Catalogos.ListaEjemplares
-                    .Where(x => seleccionados.Contains(x.id) && Catalogos.CodigoEstado(x.estado) == "DIS")
+                    .Where(x => seleccionados.Contains(x.id) && Catalogos.CodigoEstado(x.estado) == Codigos.EstadoDisponible)
                     .ToList();
 
                 if (disponibles.Count != seleccionados.Count)
@@ -217,7 +217,7 @@ namespace front_biblioteca.Pages.Ventanas
                 if (ocupados.Count > 0)
                     throw new InvalidOperationException("Uno de los ejemplares figura en un préstamo activo. Actualice la página e intente de nuevo.");
 
-                var estadoPrestado = Catalogos.IdEstado("PRE");
+                var estadoPrestado = Catalogos.IdEstado(Codigos.EstadoPrestado);
                 if (estadoPrestado == 0)
                     throw new InvalidOperationException("No existe el estado Prestado en la base de datos.");
 
@@ -291,9 +291,9 @@ namespace front_biblioteca.Pages.Ventanas
                 if (!Catalogos.PrestamoActivo(prestamo))
                     throw new InvalidOperationException("Ese préstamo ya fue devuelto.");
 
-                var estadoDevuelto = Catalogos.IdEstado("DEV");
-                var estadoDisponible = Catalogos.IdEstado("DIS");
-                var estadoActivo = Catalogos.IdEstado("ACT");
+                var estadoDevuelto = Catalogos.IdEstado(Codigos.EstadoDevuelto);
+                var estadoDisponible = Catalogos.IdEstado(Codigos.EstadoDisponible);
+                var estadoActivo = Catalogos.IdEstado(Codigos.EstadoActivo);
                 var diasAtraso = Catalogos.DiasAtraso(prestamo);
                 var multasCreadas = 0;
                 var totalMulta = 0m;
@@ -398,7 +398,7 @@ namespace front_biblioteca.Pages.Ventanas
         {
             await base.OnGetAsync();
 
-            if (User.IsInRole("LECTOR"))
+            if (User.IsInRole(Codigos.RolLector))
             {
                 Avisar("El rol Lector solo puede consultar.");
                 await RecargarAsync();
@@ -420,7 +420,7 @@ namespace front_biblioteca.Pages.Ventanas
                 foreach (var multa in multas)
                     await this.multas.Borrar(new Multas { id = multa.id });
 
-                var estadoDisponible = Catalogos.IdEstado("DIS");
+                var estadoDisponible = Catalogos.IdEstado(Codigos.EstadoDisponible);
                 foreach (var detalle in detalles)
                 {
                     if (estadoDisponible > 0)
@@ -491,7 +491,7 @@ namespace front_biblioteca.Pages.Ventanas
             List<Prestamos_Libros> detalles,
             List<Ejemplares> copias)
         {
-            var estadoDisponible = Catalogos.IdEstado("DIS");
+            var estadoDisponible = Catalogos.IdEstado(Codigos.EstadoDisponible);
 
             foreach (var detalle in detalles)
             {

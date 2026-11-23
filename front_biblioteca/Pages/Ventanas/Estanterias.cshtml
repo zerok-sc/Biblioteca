@@ -14,7 +14,7 @@
 <form method="post" class="barra">
     <input name="Buscar" value="@Model.Buscar" placeholder="Buscar por codigo o nombre" />
     <button class="boton" asp-page-handler="Consultar">Consultar</button>
-    @if (!User.IsInRole("LECTOR"))
+    @if (!User.IsInRole(Codigos.RolLector))
     {
         <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
     }
@@ -34,7 +34,7 @@
                 </select>
             </div>
         </div>
-        @if (!User.IsInRole("LECTOR"))
+        @if (!User.IsInRole(Codigos.RolLector))
         {
             <button class="boton" asp-page-handler="Guardar">Guardar</button>
         }
@@ -45,7 +45,7 @@
     <thead>
         <tr>
             <th>id</th>
-            @if (!User.IsInRole("LECTOR"))
+            @if (!User.IsInRole(Codigos.RolLector))
             {
                 <th>Codigo</th>
                 <th>Capacidad</th>
@@ -60,7 +60,7 @@
         {
             <tr>
                 <td>@item.id</td>
-                @if (!User.IsInRole("LECTOR"))
+                @if (!User.IsInRole(Codigos.RolLector))
                 {
                     <td>@item.codigo</td>
                     <td>@item.capacidad</td>
@@ -70,7 +70,7 @@
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />
-                        @if (!User.IsInRole("LECTOR"))
+                        @if (!User.IsInRole(Codigos.RolLector))
                         {
                             <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
                             <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>

@@ -5,5 +5,9 @@
 }
 
 <h1>Acceso denegado</h1>
-<p>Su rol no tiene permiso para entrar a esta ventana.</p>
+<p>Su rol (@Model.Rol) no tiene permiso para entrar a esta ventana.</p>
+@if (!string.IsNullOrWhiteSpace(Model.Pagina))
+{
+    <p class="ayuda">Página solicitada: @Model.Pagina</p>
+}
 <a asp-page="/Index" class="boton">Volver al inicio</a>

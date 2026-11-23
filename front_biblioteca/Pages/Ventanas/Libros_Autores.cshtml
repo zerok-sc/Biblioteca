@@ -14,7 +14,7 @@
 <form method="post" class="barra">
     <input name="Buscar" value="@Model.Buscar" placeholder="Buscar por codigo o nombre" />
     <button class="boton" asp-page-handler="Consultar">Consultar</button>
-    @if (!User.IsInRole("LECTOR"))
+    @if (!User.IsInRole(Codigos.RolLector))
     {
         <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
     }
@@ -38,7 +38,7 @@
             <div><label>Tipo participacion</label><input asp-for="Actual.tipo_participacion" /></div>
             <div><label>Fecha registro</label><input asp-for="Actual.fecha_registro" /></div>
         </div>
-        @if (!User.IsInRole("LECTOR"))
+        @if (!User.IsInRole(Codigos.RolLector))
         {
             <button class="boton" asp-page-handler="Guardar">Guardar</button>
         }
@@ -68,7 +68,7 @@
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />
-                        @if (!User.IsInRole("LECTOR"))
+                        @if (!User.IsInRole(Codigos.RolLector))
                         {
                             <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
                             <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>

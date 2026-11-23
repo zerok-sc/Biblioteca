@@ -13,9 +13,9 @@
 
 <form method="post" class="barra">
     <input name="Buscar" value="@Model.Buscar"
-           placeholder="@(User.IsInRole("LECTOR") ? "Buscar por nombre" : "Buscar por codigo o nombre")" />
+           placeholder="@(User.IsInRole(Codigos.RolLector) ? "Buscar por nombre" : "Buscar por codigo o nombre")" />
     <button class="boton" asp-page-handler="Consultar">Consultar</button>
-    @if (!User.IsInRole("LECTOR"))
+    @if (!User.IsInRole(Codigos.RolLector))
     {
         <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
     }
@@ -35,7 +35,7 @@
                 </select>
             </div>
         </div>
-        @if (!User.IsInRole("LECTOR"))
+        @if (!User.IsInRole(Codigos.RolLector))
         {
             <button class="boton" asp-page-handler="Guardar">Guardar</button>
         }
@@ -48,7 +48,7 @@
             <th>id</th>
             <th>Nombre</th>
             <th>Descripcion</th>
-            @if (!User.IsInRole("LECTOR"))
+            @if (!User.IsInRole(Codigos.RolLector))
             {
                 <th>Codigo</th>
             }
@@ -63,7 +63,7 @@
                 <td>@item.id</td>
                 <td>@item.nombre</td>
                 <td>@item.descripcion</td>
-                @if (!User.IsInRole("LECTOR"))
+                @if (!User.IsInRole(Codigos.RolLector))
                 {
                     <td>@item.codigo</td>
                 }
@@ -71,7 +71,7 @@
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />
-                        @if (!User.IsInRole("LECTOR"))
+                        @if (!User.IsInRole(Codigos.RolLector))
                         {
                             <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
                             <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>

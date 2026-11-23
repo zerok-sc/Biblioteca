@@ -9,7 +9,7 @@ using presentacion_libreria.interfaces;
 
 namespace front_biblioteca.Pages
 {
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = Codigos.RolAdmin)]
     public class CrearUsuarioModel : PageModel
     {
         private readonly IAutenticacion autenticacion;

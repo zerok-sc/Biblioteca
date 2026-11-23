@@ -5,7 +5,7 @@ using presentacion_libreria.interfaces;
 
 namespace front_biblioteca.Pages.Ventanas
 {
-[Authorize(Roles = "ADMIN,BIBLIO")]
+[Authorize(Roles = Codigos.RolesOperador)]
     public class EstadosModel : PaginaBase<Estados>
     {
         public EstadosModel(IPresentacion<Estados> presentacion, Catalogos catalogos) : base(presentacion, catalogos)

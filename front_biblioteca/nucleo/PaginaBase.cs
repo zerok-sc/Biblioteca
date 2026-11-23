@@ -24,7 +24,7 @@ namespace front_biblioteca.nucleo
             Catalogos = catalogos;
         }
 
-        private bool SoloLectura => User.IsInRole("LECTOR");
+        private bool SoloLectura => User.IsInRole(Codigos.RolLector);
 
         private static bool EsSimple(Type tipo)
         {

@@ -14,7 +14,7 @@
 <form method="post" class="barra">
     <input name="Buscar" value="@Model.Buscar" placeholder="Buscar por codigo o nombre" />
     <button class="boton" asp-page-handler="Consultar">Consultar</button>
-    @if (!User.IsInRole("LECTOR"))
+    @if (!User.IsInRole(Codigos.RolLector))
     {
         <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
     }
@@ -39,7 +39,7 @@
                 </select>
             </div>
         </div>
-        @if (!User.IsInRole("LECTOR"))
+        @if (!User.IsInRole(Codigos.RolLector))
         {
             <button class="boton" asp-page-handler="Guardar">Guardar</button>
         }
@@ -77,7 +77,7 @@
                         <a class="boton boton-claro" asp-page="/Comprobante"
                            asp-route-tipo="multa" asp-route-id="@item.id">Factura / PDF</a>
 
-                        @if (!User.IsInRole("LECTOR"))
+                        @if (!User.IsInRole(Codigos.RolLector))
                         {
                             <form method="post" style="display:inline">
                                 <input type="hidden" name="id" value="@item.id" />

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace front_biblioteca.Pages
 {
-    [Authorize(Roles = "LECTOR")]
+    [Authorize(Roles = Codigos.RolLector)]
     public class MisPrestamosModel : PageModel
     {
         private readonly Catalogos catalogos;
@@ -56,9 +56,9 @@ namespace front_biblioteca.Pages
                 .Where(x => idsDetalles.Contains(x.prestamo_libro))
                 .ToList();
 
-            MultasPendientes = listaMultas.Count(x => catalogos.CodigoEstado(x.estado) == "ACT");
+            MultasPendientes = listaMultas.Count(x => catalogos.CodigoEstado(x.estado) == Codigos.EstadoActivo);
             ValorMultasPendientes = listaMultas
-                .Where(x => catalogos.CodigoEstado(x.estado) == "ACT")
+                .Where(x => catalogos.CodigoEstado(x.estado) == Codigos.EstadoActivo)
                 .Sum(x => x.valor);
 
             Multas = listaMultas

@@ -52,6 +52,8 @@ namespace front_biblioteca.nucleo
 
         private bool cargado;
 
+        public List<string> CodigosFaltantes { get; private set; } = new();
+
         public Catalogos(
             IPresentacion<Personas> personas,
             IPresentacion<Empleados> empleados,
@@ -103,33 +105,65 @@ namespace front_biblioteca.nucleo
             if (cargado)
                 return;
 
-            var tareas = new List<Task>
+            var tareas = new List<Func<Task>>
             {
-                CargarPersonas(),
-                CargarEmpleados(),
-                CargarEstados(),
-                CargarEditoriales(),
-                CargarIdiomas(),
-                CargarLibros(),
-                CargarAutores(),
-                CargarCategorias(),
-                CargarSecciones(),
-                CargarEstanterias(),
-                CargarUbicaciones(),
-                CargarEjemplares(),
-                CargarProveedores(),
-                CargarRoles(),
-                CargarUsuarios(),
-                CargarPrestamos(),
-                CargarPrestamosLibros(),
-                CargarMultas(),
-                CargarLibrosAutores(),
-                CargarLibrosCategorias(),
-                CargarSalarios()
+                CargarPersonas,
+                CargarEmpleados,
+                CargarEstados,
+                CargarEditoriales,
+                CargarIdiomas,
+                CargarLibros,
+                CargarAutores,
+                CargarCategorias,
+                CargarSecciones,
+                CargarEstanterias,
+                CargarUbicaciones,
+                CargarEjemplares,
+                CargarProveedores,
+                CargarRoles,
+                CargarUsuarios,
+                CargarPrestamos,
+                CargarPrestamosLibros,
+                CargarMultas,
+                CargarLibrosAutores,
+                CargarLibrosCategorias,
+                CargarSalarios
             };
 
-            await Task.WhenAll(tareas);
+            // De a 8: si la API no responde, no se agotan los hilos del servidor.
+            using var cupo = new SemaphoreSlim(8);
+            await Task.WhenAll(tareas.Select(async tarea =>
+            {
+                await cupo.WaitAsync();
+                try { await tarea(); }
+                finally { cupo.Release(); }
+            }));
+            ValidarCodigos();
             cargado = true;
+        }
+
+        private void ValidarCodigos()
+        {
+            var faltantes = new List<string>();
+
+            string[] estados =
+            {
+                Codigos.EstadoActivo, Codigos.EstadoInactivo, Codigos.EstadoPrestado,
+                Codigos.EstadoDisponible, Codigos.EstadoMantenimiento, Codigos.EstadoDevuelto,
+                Codigos.EstadoAtrasado, Codigos.EstadoPagada
+            };
+
+            string[] roles = { Codigos.RolAdmin, Codigos.RolBibliotecario, Codigos.RolLector };
+
+            faltantes.AddRange(estados
+                .Where(codigo => ListaEstados.All(x => x.codigo != codigo))
+                .Select(codigo => $"Estado {codigo}"));
+
+            faltantes.AddRange(roles
+                .Where(codigo => ListaRoles.All(x => x.codigo != codigo))
+                .Select(codigo => $"Rol {codigo}"));
+
+            CodigosFaltantes = faltantes;
         }
 
         public async Task RecargarAsync()
@@ -184,7 +218,7 @@ namespace front_biblioteca.nucleo
             ListaEstados.FirstOrDefault(x => x.codigo == codigo)?.id ?? 0;
 
         public bool EstadoEsActivo(int id) =>
-            CodigoEstado(id) is "PRE" or "ATR";
+            CodigoEstado(id) is Codigos.EstadoPrestado or Codigos.EstadoAtrasado;
 
         public bool PrestamoActivo(Prestamos prestamo) =>
             EstadoEsActivo(prestamo.estado);
@@ -421,12 +455,12 @@ namespace front_biblioteca.nucleo
 
         public List<SelectListItem> OpcionesEstados =>
             ConVacio(ListaEstados
-                .Where(x => x.codigo != "PAG")
+                .Where(x => x.codigo != Codigos.EstadoPagada)
                 .Select(x => new SelectListItem(x.nombre, x.id.ToString())));
 
         public List<SelectListItem> OpcionesEstadosMulta =>
             ConVacio(ListaEstados
-                .Where(x => x.codigo is "ACT" or "INA" or "PAG")
+                .Where(x => x.codigo is Codigos.EstadoActivo or Codigos.EstadoInactivo or Codigos.EstadoPagada)
                 .Select(x => new SelectListItem(x.nombre, x.id.ToString())));
 
         public List<SelectListItem> OpcionesEditoriales =>
