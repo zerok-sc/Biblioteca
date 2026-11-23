@@ -5,7 +5,25 @@
 }
 
 <h1>Gestión de biblioteca</h1>
-<p>Bienvenido, @User.Identity?.Name</p>
+
+<div class="perfil">
+    <div>
+        @if (!string.IsNullOrEmpty(Model.Imagen))
+        {
+            <img height="64" width="64" class="foto"
+                 src="data:@Model.TipoImagen;base64,@Model.Imagen"
+                 alt="Foto de perfil" />
+        }
+        else
+        {
+            <div class="foto sin-foto" style="width:64px;height:64px">Sin foto</div>
+        }
+    </div>
+    <div>
+        <p>Bienvenido, @User.Identity?.Name</p>
+        <a asp-page="/Perfil" class="ayuda">Cambiar foto</a>
+    </div>
+</div>
 
 @if (ViewData.ContainsKey("Mensaje"))
 {

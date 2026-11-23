@@ -1,7 +1,9 @@
-﻿using aplicaciones_libreria.entidades;
+﻿using System.Security.Claims;
+using aplicaciones_libreria.entidades;
 using front_biblioteca.nucleo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using presentacion_libreria.interfaces;
 
 namespace front_biblioteca.Pages
 {
@@ -16,6 +18,10 @@ namespace front_biblioteca.Pages
               "Ejemplares", "Secciones", "Estanterias", "Ubicaciones" };
 
         private readonly Catalogos catalogos;
+        private readonly IAutenticacion autenticacion;
+
+        public string? Imagen { get; private set; }
+        public string TipoImagen { get; private set; } = "image/png";
 
         public bool EsOperador => User.IsInRole("ADMIN") || User.IsInRole("BIBLIO");
 
@@ -33,9 +39,10 @@ namespace front_biblioteca.Pages
         public List<Prestamos> Atrasados { get; private set; } = new();
         public List<Prestamos> PorVencer { get; private set; } = new();
 
-        public IndexModel(Catalogos catalogos)
+        public IndexModel(Catalogos catalogos, IAutenticacion autenticacion)
         {
             this.catalogos = catalogos;
+            this.autenticacion = autenticacion;
         }
 
         public bool PuedeVer(string entidad)
@@ -51,6 +58,9 @@ namespace front_biblioteca.Pages
 
         public async Task OnGetAsync()
         {
+            TipoImagen = User.FindFirst("ImagenTipo")?.Value ?? "image/png";
+            await CargarImagenAsync();
+
             try
             {
                 await catalogos.CargarAsync();
@@ -89,6 +99,22 @@ namespace front_biblioteca.Pages
             catch (Exception ex)
             {
                 LogConversor.Log(ex, ViewData);
+            }
+        }
+
+        private async Task CargarImagenAsync()
+        {
+            try
+            {
+                if (int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var id)
+                    && id > 0)
+                {
+                    Imagen = await autenticacion.ObtenerFoto(id);
+                }
+            }
+            catch
+            {
+                // La foto no debe impedir mostrar el inicio.
             }
         }
 
