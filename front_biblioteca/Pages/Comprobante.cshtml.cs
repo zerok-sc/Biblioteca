@@ -79,7 +79,7 @@ namespace front_biblioteca.Pages
             catalogos.NombreLibroDePrestamoLibro(multa.prestamo_libro);
 
         public int DiasAtraso(Multas multa) =>
-            catalogos.DiasAtrasoDePrestamoLibro(multa.prestamo_libro);
+            catalogos.DiasAtrasoDeMulta(multa);
 
         public string Situacion(Prestamos prestamo)
         {

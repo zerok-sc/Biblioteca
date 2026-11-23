@@ -56,8 +56,8 @@ namespace front_biblioteca.nucleo
 
             try
             {
-                var servicio = HttpContext.RequestServices.GetRequiredService<IPresentacion<Auditorias>>();
-                await servicio.Insertar(new Auditorias
+                var servicio = HttpContext.RequestServices.GetRequiredService<IAuditoriaPresentacion>();
+                await servicio.Registrar(new Auditorias
                 {
                     entidad = entidad ?? typeof(T).Name,
                     entidad_id = entidadId,
@@ -96,7 +96,7 @@ namespace front_biblioteca.nucleo
             await CargarAsync();
         }
 
-        public async Task OnPostConsultarAsync()
+        public virtual async Task OnPostConsultarAsync()
         {
             ViewData.Remove("Mensaje");
             try

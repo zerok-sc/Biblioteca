@@ -36,6 +36,26 @@ namespace front_biblioteca.Pages.Ventanas
             await CargarDetallesAsync();
         }
 
+        // Los handlers genéricos solo cargan la cabecera; aquí también hace falta
+        // la tabla de libros comprados.
+        public override async Task OnPostConsultarAsync()
+        {
+            await base.OnPostConsultarAsync();
+            await CargarDetallesAsync();
+        }
+
+        public override async Task OnPostNuevoAsync()
+        {
+            await base.OnPostNuevoAsync();
+            await CargarDetallesAsync();
+        }
+
+        public override async Task OnPostEditarAsync(int id)
+        {
+            await base.OnPostEditarAsync(id);
+            await CargarDetallesAsync();
+        }
+
         public List<Compras_Libros> DetallesDe(int compraId) =>
             Detalles.Where(x => x.compra == compraId).ToList();
 
@@ -117,7 +137,9 @@ namespace front_biblioteca.Pages.Ventanas
                     costo_unitario = CostoUnitario
                 });
 
-                var prefijo = $"EJM-{DateTime.Now:yyyyMMddHHmmssfff}";
+                // El id de la compra en el código permite identificar las copias
+                // creadas por esta compra si después hay que darla de baja.
+                var prefijo = $"EJM-C{compra.id}";
                 for (var i = 1; i <= Cantidad; i++)
                 {
                     await ejemplares.Insertar(new Ejemplares
@@ -189,18 +211,44 @@ namespace front_biblioteca.Pages.Ventanas
 
             try
             {
-                var detalle = (await detalles.Consultar()).FirstOrDefault(x => x.compra == id);
-                if (detalle is not null)
+                var detallesCompra = (await detalles.Consultar())
+                    .Where(x => x.compra == id)
+                    .ToList();
+
+                var prefijo = $"EJM-C{id}-";
+                var copias = Catalogos.ListaEjemplares
+                    .Where(x => x.codigo is not null &&
+                                x.codigo.StartsWith(prefijo, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                if (copias.Any(x => Catalogos.EstadoEsActivo(x.estado)))
                 {
-                    Avisar("No se puede borrar: la compra tiene libros registrados.");
+                    Avisar("No se puede borrar: hay ejemplares de esta compra prestados.");
                     await RecargarAsync();
                     return Page();
+                }
+
+                var estadoDisponible = Catalogos.IdEstado("DIS");
+                if (estadoDisponible > 0)
+                {
+                    foreach (var copia in copias.Where(x => x.estado != estadoDisponible))
+                    {
+                        copia.estado = estadoDisponible;
+                        await ejemplares.Actualizar(copia);
+                    }
+                }
+
+                foreach (var detalle in detallesCompra)
+                {
+                    await detalles.Borrar(detalle);
+                    await RegistrarAuditoriaAsync(
+                        "BAJA", Snapshot(detalle), null, detalle.id, "Compras_Libros");
                 }
 
                 var compra = (await presentacion.Consultar()).FirstOrDefault(x => x.id == id);
                 await presentacion.Borrar(new Compras { id = id });
                 await RegistrarAuditoriaAsync("BAJA", Snapshot(compra), null, id);
-                Avisar("Compra eliminada correctamente.");
+                Avisar($"Compra eliminada. Se dieron de baja {detallesCompra.Count} detalle(s).");
             }
             catch (Exception ex)
             {

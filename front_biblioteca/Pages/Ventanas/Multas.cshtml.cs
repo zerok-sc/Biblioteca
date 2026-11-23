@@ -21,7 +21,7 @@ namespace front_biblioteca.Pages.Ventanas
             Catalogos.NombreLibroDePrestamoLibro(multa.prestamo_libro);
 
         public int DiasAtraso(Multas multa) =>
-            Catalogos.DiasAtrasoDePrestamoLibro(multa.prestamo_libro);
+            Catalogos.DiasAtrasoDeMulta(multa);
 
         public bool EsPagada(Multas multa) =>
             Catalogos.CodigoEstado(multa.estado) == "PAG";

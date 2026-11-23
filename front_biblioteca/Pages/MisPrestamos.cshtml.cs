@@ -67,7 +67,7 @@ namespace front_biblioteca.Pages
                     id = x.id,
                     Libro = catalogos.NombreLibroDePrestamoLibro(x.prestamo_libro),
                     Valor = x.valor,
-                    Dias = catalogos.DiasAtrasoDePrestamoLibro(x.prestamo_libro),
+                    Dias = catalogos.DiasAtrasoDeMulta(x),
                     Estado = catalogos.NombreEstado(x.estado)
                 })
                 .OrderByDescending(x => x.id)

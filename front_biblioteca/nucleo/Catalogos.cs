@@ -328,6 +328,24 @@ namespace front_biblioteca.nucleo
             return prestamo is null ? 0 : DiasAtraso(prestamo);
         }
 
+        // Días cobrados cuando se generó la multa. No se recalculan con hoy:
+        // si se usa DateTime.Today, el valor sigue creciendo después de pagar.
+        public int DiasAtrasoDeMulta(Multas multa)
+        {
+            if (multa.fecha == default)
+                return 0;
+
+            var detalle = ListaPrestamosLibros.FirstOrDefault(x => x.id == multa.prestamo_libro);
+            if (detalle is null)
+                return 0;
+
+            var prestamo = ListaPrestamos.FirstOrDefault(x => x.id == detalle.prestamo);
+            if (prestamo is null)
+                return 0;
+
+            return Math.Max(0, (multa.fecha.Date - prestamo.fecha_fin.Date).Days);
+        }
+
         public List<SelectListItem> OpcionesPersonas =>
             ConVacio(ListaPersonas.Select(x => new SelectListItem(
                 $"{x.nombre} ({x.cedula})", x.id.ToString())));

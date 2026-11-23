@@ -14,16 +14,10 @@
 <form method="post" class="barra">
     <input name="Buscar" value="@Model.Buscar" placeholder="Buscar por codigo o nombre" />
     <button class="boton" asp-page-handler="Consultar">Consultar</button>
-    @if (!User.IsInRole("LECTOR"))
-    {
-        <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
-    }
 </form>
 
-@if (User.IsInRole("ADMIN"))
-{
-    <p><a asp-page="/CrearUsuario" class="boton">Crear usuario</a></p>
-}
+<p><a asp-page="/CrearUsuario" class="boton">Crear usuario</a></p>
+<p class="ayuda">Para dar de alta un usuario use «Crear usuario»: allí se guarda la clave cifrada.</p>
 
 @if (Model.MostrarFormulario)
 {

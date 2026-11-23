@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<IComunicaciones, Comunicaciones>();
 builder.Services.AddScoped(typeof(IPresentacion<>), typeof(Presentacion<>));
+builder.Services.AddScoped<IAuditoriaPresentacion, AuditoriaPresentacion>();
 builder.Services.AddScoped<IAutenticacion, Autenticacion>();
 builder.Services.AddScoped<Catalogos>();
 
