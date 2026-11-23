@@ -65,6 +65,9 @@ Está en `servicios_biblioteca/appsettings.json` y `aplicaciones_libreria/nucleo
 - **Auditorías**: solo ADMIN. Registra altas, ediciones, borrados, `PRESTAR`, `DEVOLVER`, `RENOVAR`, `MULTA`, `PAGAR` y `COMPRA`, con usuario, IP y valores anteriores/nuevos.
 - **Fotos de perfil**: máximo 2 MB, se guardan en `Usuarios.foto`.
 
+Si vienes de una versión anterior, aplica `aplicaciones_libreria/ActualizarCompras.sql`
+para agregar la tabla `Compras_Libros` sin borrar la base.
+
 ## Pruebas
 
 ```bash
