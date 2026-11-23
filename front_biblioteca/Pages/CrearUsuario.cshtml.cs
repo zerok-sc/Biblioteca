@@ -3,6 +3,7 @@ using aplicaciones_libreria.nucleo;
 using front_biblioteca.nucleo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using presentacion_libreria.interfaces;
 
@@ -19,6 +20,7 @@ namespace front_biblioteca.Pages
         [BindProperty] public string ConfirmarClave { get; set; } = "";
         public List<Roles> ListaRoles { get; set; } = new();
         public List<Personas> ListaPersonas { get; set; } = new();
+        public List<SelectListItem> OpcionesPersonas { get; private set; } = new();
 
         public CrearUsuarioModel(
             IAutenticacion autenticacion,
@@ -37,6 +39,22 @@ namespace front_biblioteca.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (string.IsNullOrWhiteSpace(Formulario.nombre_usuario)
+                || string.IsNullOrWhiteSpace(Formulario.correo)
+                || string.IsNullOrWhiteSpace(Formulario.clave))
+            {
+                ViewData["Mensaje"] = "Usuario, correo y clave son obligatorios.";
+                await CargarListasAsync();
+                return Page();
+            }
+
+            if (Formulario.rol <= 0 || Formulario.persona <= 0)
+            {
+                ViewData["Mensaje"] = "Seleccione un rol y una persona válidos.";
+                await CargarListasAsync();
+                return Page();
+            }
+
             if (Formulario.clave != ConfirmarClave)
             {
                 ViewData["Mensaje"] = "La clave y la confirmación no coinciden.";
@@ -72,6 +90,10 @@ namespace front_biblioteca.Pages
             {
                 ListaRoles = await roles.Consultar();
                 ListaPersonas = await personas.Consultar();
+                OpcionesPersonas = ListaPersonas
+                    .Select(x => new SelectListItem(
+                        $"{x.nombre} ({x.cedula})", x.id.ToString()))
+                    .ToList();
             }
             catch (Exception ex)
             {

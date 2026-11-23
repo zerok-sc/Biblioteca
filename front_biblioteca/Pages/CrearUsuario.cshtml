@@ -16,29 +16,33 @@
     <div class="campos">
         <div>
             <label>Usuario</label>
-            <input asp-for="Formulario.nombre_usuario" />
+            <input asp-for="Formulario.nombre_usuario" required />
         </div>
         <div>
             <label>Correo</label>
-            <input asp-for="Formulario.correo" />
+            <input asp-for="Formulario.correo" required />
         </div>
         <div>
             <label>Clave</label>
-            <input type="password" asp-for="Formulario.clave" />
+            <input type="password" asp-for="Formulario.clave" required />
         </div>
         <div>
             <label>Confirmar clave</label>
-            <input type="password" asp-for="ConfirmarClave" />
+            <input type="password" asp-for="ConfirmarClave" required />
         </div>
         <div>
             <label>Rol</label>
-            <select asp-for="Formulario.rol"
-                    asp-items="@(new SelectList(Model.ListaRoles, "id", "nombre"))"></select>
+            <select asp-for="Formulario.rol" required
+                    asp-items="@(new SelectList(Model.ListaRoles, "id", "nombre"))">
+                <option value="">Seleccione un rol</option>
+            </select>
         </div>
         <div>
             <label>Persona</label>
-            <select asp-for="Formulario.persona"
-                    asp-items="@(new SelectList(Model.ListaPersonas, "id", "nombre"))"></select>
+            <select asp-for="Formulario.persona" required
+                    asp-items="Model.OpcionesPersonas">
+                <option value="">Seleccione una persona</option>
+            </select>
         </div>
         <div>
             <label>Activo</label>

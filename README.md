@@ -65,6 +65,7 @@ Está en `servicios_biblioteca/appsettings.json` y `aplicaciones_libreria/nucleo
 - **Auditorías**: solo ADMIN y solo lectura. Registra altas, ediciones, borrados, `PRESTAR`, `DEVOLVER`, `RENOVAR`, `MULTA`, `PAGAR` y `COMPRA`, con usuario, IP y valores anteriores/nuevos.
 - **Sesiones**: ADMIN ve ingresos, intentos fallidos y cierres con IP, agente y motivo.
 - **Borrados**: si el registro tiene datos relacionados, devuelve un mensaje claro en vez de error 500.
+- **Crear usuario**: exige elegir rol y persona; la persona se muestra con cédula para evitar confusiones.
 - **Fotos de perfil**: máximo 2 MB, se guardan en `Usuarios.foto`.
 
 Si vienes de una versión anterior, aplica `aplicaciones_libreria/ActualizarCompras.sql`
