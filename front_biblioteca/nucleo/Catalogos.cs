@@ -210,11 +210,35 @@ namespace front_biblioteca.nucleo
         public string NombreSeccion(int id) =>
             id == 0 ? "No asignado" : ListaSecciones.FirstOrDefault(x => x.id == id)?.nombre ?? "No asignado";
 
-        public string NombreEstanteria(int id) =>
-            id == 0 ? "No asignado" : ListaEstanterias.FirstOrDefault(x => x.id == id)?.codigo ?? "No asignado";
+        public string NombreEstanteria(int id)
+        {
+            var estanteria = ListaEstanterias.FirstOrDefault(x => x.id == id);
+            if (estanteria is null)
+                return "No asignado";
 
-        public string NombreUbicacion(int id) =>
-            id == 0 ? "No asignado" : ListaUbicaciones.FirstOrDefault(x => x.id == id)?.codigo ?? "No asignado";
+            var seccion = estanteria.seccion == 0
+                ? null
+                : ListaSecciones.FirstOrDefault(x => x.id == estanteria.seccion);
+
+            return seccion is null
+                ? $"Estantería {estanteria.numero}"
+                : $"Estantería {estanteria.numero} ({seccion.nombre})";
+        }
+
+        public string NombreUbicacion(int id)
+        {
+            var ubicacion = ListaUbicaciones.FirstOrDefault(x => x.id == id);
+            if (ubicacion is null)
+                return "No asignado";
+
+            var partes = new List<string>();
+            if (!string.IsNullOrWhiteSpace(ubicacion.descripcion))
+                partes.Add(ubicacion.descripcion.Trim());
+            partes.Add($"Piso {ubicacion.piso}");
+            partes.Add(NombreEstanteria(ubicacion.estanteria));
+
+            return string.Join(" · ", partes);
+        }
 
         public string NombreEjemplar(int id) =>
             id == 0 ? "No asignado" : ListaEjemplares.FirstOrDefault(x => x.id == id)?.codigo ?? "No asignado";
@@ -261,6 +285,18 @@ namespace front_biblioteca.nucleo
                 .ToList();
 
             return ejemplares.Count == 0 ? "Sin ejemplares" : string.Join(", ", ejemplares);
+        }
+
+        public string UbicacionesDePrestamo(int prestamoId)
+        {
+            var ubicaciones = PrestamosLibrosDe(prestamoId)
+                .Select(x => ListaEjemplares.FirstOrDefault(e => e.id == x.ejemplar)?.ubicacion ?? 0)
+                .Where(x => x > 0)
+                .Distinct()
+                .Select(NombreUbicacion)
+                .ToList();
+
+            return ubicaciones.Count == 0 ? "Sin ubicación" : string.Join(", ", ubicaciones);
         }
 
         public int CantidadEjemplaresDePrestamo(int prestamoId) =>
@@ -328,10 +364,10 @@ namespace front_biblioteca.nucleo
             ConVacio(ListaSecciones.Select(x => new SelectListItem(x.nombre, x.id.ToString())));
 
         public List<SelectListItem> OpcionesEstanterias =>
-            ConVacio(ListaEstanterias.Select(x => new SelectListItem(x.codigo, x.id.ToString())));
+            ConVacio(ListaEstanterias.Select(x => new SelectListItem(NombreEstanteria(x.id), x.id.ToString())));
 
         public List<SelectListItem> OpcionesUbicaciones =>
-            ConVacio(ListaUbicaciones.Select(x => new SelectListItem(x.codigo, x.id.ToString())));
+            ConVacio(ListaUbicaciones.Select(x => new SelectListItem(NombreUbicacion(x.id), x.id.ToString())));
 
         public List<SelectListItem> OpcionesEjemplares =>
             ConVacio(ListaEjemplares.Select(x => new SelectListItem(x.codigo, x.id.ToString())));

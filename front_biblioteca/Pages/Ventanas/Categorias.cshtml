@@ -12,7 +12,8 @@
 }
 
 <form method="post" class="barra">
-    <input name="Buscar" value="@Model.Buscar" placeholder="Buscar por codigo o nombre" />
+    <input name="Buscar" value="@Model.Buscar"
+           placeholder="@(User.IsInRole("LECTOR") ? "Buscar por nombre" : "Buscar por codigo o nombre")" />
     <button class="boton" asp-page-handler="Consultar">Consultar</button>
     @if (!User.IsInRole("LECTOR"))
     {
@@ -47,7 +48,10 @@
             <th>id</th>
             <th>Nombre</th>
             <th>Descripcion</th>
-            <th>Codigo</th>
+            @if (!User.IsInRole("LECTOR"))
+            {
+                <th>Codigo</th>
+            }
             <th>Estado</th>
             <th>Acciones</th>
         </tr>
@@ -59,7 +63,10 @@
                 <td>@item.id</td>
                 <td>@item.nombre</td>
                 <td>@item.descripcion</td>
-                <td>@item.codigo</td>
+                @if (!User.IsInRole("LECTOR"))
+                {
+                    <td>@item.codigo</td>
+                }
                 <td>@Model.Catalogos.NombreEstado(item.estado)</td>
                 <td>
                     <form method="post" style="display:inline">

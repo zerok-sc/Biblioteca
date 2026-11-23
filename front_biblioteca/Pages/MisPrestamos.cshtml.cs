@@ -86,6 +86,9 @@ namespace front_biblioteca.Pages
         public string Ejemplares(Prestamos prestamo) =>
             catalogos.EjemplaresDePrestamo(prestamo.id);
 
+        public string Ubicaciones(Prestamos prestamo) =>
+            catalogos.UbicacionesDePrestamo(prestamo.id);
+
         public string Situacion(Prestamos prestamo)
         {
             if (!catalogos.PrestamoActivo(prestamo))

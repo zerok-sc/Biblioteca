@@ -45,7 +45,10 @@
     <thead>
         <tr>
             <th>id</th>
-            <th>Codigo</th>
+            @if (!User.IsInRole("LECTOR"))
+            {
+                <th>Codigo</th>
+            }
             <th>Piso</th>
             <th>Descripcion</th>
             <th>Estanteria</th>
@@ -57,7 +60,10 @@
         {
             <tr>
                 <td>@item.id</td>
-                <td>@item.codigo</td>
+                @if (!User.IsInRole("LECTOR"))
+                {
+                    <td>@item.codigo</td>
+                }
                 <td>@item.piso</td>
                 <td>@item.descripcion</td>
                 <td>@Model.Catalogos.NombreEstanteria(item.estanteria)</td>

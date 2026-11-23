@@ -34,6 +34,7 @@ else
                 <th>id</th>
                 <th>Código</th>
                 <th>Ejemplares</th>
+                <th>Ubicación</th>
                 <th>Inicio</th>
                 <th>Final</th>
                 <th>Situación</th>
@@ -46,6 +47,7 @@ else
                     <td>@item.id</td>
                     <td>@item.codigo</td>
                     <td>@Model.Ejemplares(item)</td>
+                    <td>@Model.Ubicaciones(item)</td>
                     <td>@item.fecha_inicio.ToString("dd/MM/yyyy")</td>
                     <td>@item.fecha_fin.ToString("dd/MM/yyyy")</td>
                     <td><span class="etiqueta @Model.ClaseSituacion(item)">@Model.Situacion(item)</span></td>
