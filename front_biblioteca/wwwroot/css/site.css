@@ -111,17 +111,37 @@ table {
     width: 100%;
     border-collapse: collapse;
     background: #fffdf8;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 th, td {
-    padding: 8px;
+    padding: 9px 10px;
     border: 1px solid #ded3c2;
     text-align: left;
     font-size: 14px;
+    vertical-align: middle;
 }
 
 th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     background: #efe2cf;
+    white-space: nowrap;
+}
+
+tbody tr:nth-child(even) {
+    background: #faf6ef;
+}
+
+tbody tr:hover {
+    background: #f3e8d8;
+}
+
+td .boton {
+    margin: 2px;
+    padding: 6px 10px;
+    font-size: 13px;
 }
 
 .campos {
@@ -359,6 +379,13 @@ footer {
     text-align: center;
 }
 
+@media (max-width: 700px) {
+    th, td {
+        padding: 6px;
+        font-size: 13px;
+    }
+}
+
 @media print {
     .menu,
     footer,
@@ -386,6 +413,7 @@ footer {
     }
 
     th {
+        position: static;
         background: #eee;
     }
 }
