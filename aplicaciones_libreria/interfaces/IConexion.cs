@@ -28,6 +28,7 @@ namespace aplicaciones_libreria.interfaces
         DbSet<Multas>? Multas { get; set; }
         DbSet<Proveedores>? Proveedores { get; set; }
         DbSet<Compras>? Compras { get; set; }
+        DbSet<Compras_Libros>? Compras_Libros { get; set; }
         DbSet<Roles>? Roles { get; set; }
         DbSet<Usuarios>? Usuarios { get; set; }
         DbSet<Sesiones>? Sesiones { get; set; }

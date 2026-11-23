@@ -58,6 +58,7 @@ namespace aplicaciones_libreria.implementaciones
         public DbSet<Multas>? Multas { get; set; }
         public DbSet<Proveedores>? Proveedores { get; set; }
         public DbSet<Compras>? Compras { get; set; }
+        public DbSet<Compras_Libros>? Compras_Libros { get; set; }
         public DbSet<Roles>? Roles { get; set; }
         public DbSet<Usuarios>? Usuarios { get; set; }
         public DbSet<Sesiones>? Sesiones { get; set; }

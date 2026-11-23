@@ -180,6 +180,14 @@ CREATE TABLE [Compras] (
     [empleado] INT NOT NULL REFERENCES [Empleados]([id])
 );
 
+CREATE TABLE [Compras_Libros] (
+    [id] INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+    [compra] INT NOT NULL REFERENCES [Compras]([id]),
+    [libro] INT NOT NULL REFERENCES [Libros]([id]),
+    [cantidad] INT NOT NULL,
+    [costo_unitario] DECIMAL(10, 2) NOT NULL
+);
+
 CREATE TABLE [Roles] (
     [id] INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
     [nombre] NVARCHAR(50) NOT NULL,

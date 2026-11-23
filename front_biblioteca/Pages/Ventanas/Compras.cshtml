@@ -26,7 +26,7 @@
         <input type="hidden" asp-for="Actual.id" />
         <div class="campos">
             <div><label>Fecha</label><input asp-for="Actual.fecha" /></div>
-            <div><label>Total</label><input asp-for="Actual.total" /></div>
+            <div><label>Total</label><input asp-for="Actual.total" readonly /></div>
             <div>
                 <label>Proveedor</label>
                 <select asp-for="Actual.proveedor" required asp-items="Model.Catalogos.OpcionesProveedores">
@@ -37,10 +37,27 @@
                 <select asp-for="Actual.empleado" required asp-items="Model.Catalogos.OpcionesEmpleados">
                 </select>
             </div>
+            @if (Model.Actual.id == 0)
+            {
+                <div>
+                    <label>Libro</label>
+                    <select asp-for="LibroSeleccionado" required asp-items="Model.Catalogos.OpcionesLibros"></select>
+                </div>
+                <div><label>Cantidad</label><input asp-for="Cantidad" type="number" min="1" value="1" /></div>
+                <div><label>Costo unitario</label><input asp-for="CostoUnitario" type="number" min="0.01" step="0.01" /></div>
+                <div>
+                    <label>Ubicación</label>
+                    <select asp-for="UbicacionSeleccionada" required asp-items="Model.Catalogos.OpcionesUbicaciones"></select>
+                </div>
+            }
         </div>
+        @if (Model.Actual.id == 0)
+        {
+            <p class="aviso">El total se calcula solo y se crean los ejemplares en estado Disponible.</p>
+        }
         @if (!User.IsInRole("LECTOR"))
         {
-            <button class="boton" asp-page-handler="Guardar">Guardar</button>
+            <button class="boton" asp-page-handler="GuardarCompra">Guardar</button>
         }
     </form>
 }
@@ -71,7 +88,7 @@
                         @if (!User.IsInRole("LECTOR"))
                         {
                             <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
-                            <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
+                            <button class="boton boton-peligro" asp-page-handler="BorrarCompra">Borrar</button>
                         }
                     </form>
                 </td>
@@ -79,3 +96,38 @@
         }
     </tbody>
 </table>
+
+<h2>Libros comprados</h2>
+
+@if (Model.Detalles.Count == 0)
+{
+    <p class="aviso">Todavía no hay libros registrados en las compras.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Compra</th>
+                <th>Libro</th>
+                <th>Cantidad</th>
+                <th>Costo unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detalle in Model.Detalles)
+            {
+                <tr>
+                    <td>@detalle.id</td>
+                    <td>@detalle.compra</td>
+                    <td>@Model.Catalogos.NombreLibro(detalle.libro)</td>
+                    <td>@detalle.cantidad</td>
+                    <td>@detalle.costo_unitario.ToString("N0")</td>
+                    <td>@Model.Subtotal(detalle).ToString("N0")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

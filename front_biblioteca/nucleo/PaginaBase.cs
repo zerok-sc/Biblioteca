@@ -91,7 +91,7 @@ namespace front_biblioteca.nucleo
             return false;
         }
 
-        public async Task OnGetAsync()
+        public virtual async Task OnGetAsync()
         {
             await CargarAsync();
         }
@@ -265,7 +265,7 @@ namespace front_biblioteca.nucleo
             return Task.CompletedTask;
         }
 
-        private async Task CargarAsync()
+        protected async Task CargarAsync()
         {
             try
             {

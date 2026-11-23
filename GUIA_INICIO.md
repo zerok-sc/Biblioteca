@@ -11,7 +11,7 @@ podman exec mssql /opt/mssql-tools18/bin/sqlcmd -S localhost \
   -U sa -P 'Biblioteca#2026' -C -b -i /tmp/Script.sql
 ```
 
-El script crea `biblioteca_db` con 24 tablas y datos de ejemplo. Borra lo que
+El script crea `biblioteca_db` con 25 tablas y datos de ejemplo. Borra lo que
 había antes, incluidas las fotos.
 
 ## 2. Servicios
