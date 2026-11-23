@@ -24,6 +24,9 @@ namespace front_biblioteca.nucleo
         private readonly IPresentacion<Prestamos> prestamos;
         private readonly IPresentacion<Prestamos_Libros> prestamosLibros;
         private readonly IPresentacion<Multas> multas;
+        private readonly IPresentacion<Libros_Autores> librosAutores;
+        private readonly IPresentacion<Libros_Categorias> librosCategorias;
+        private readonly IPresentacion<Salarios> salarios;
 
         public List<Personas> ListaPersonas { get; private set; } = new();
         public List<Empleados> ListaEmpleados { get; private set; } = new();
@@ -43,6 +46,9 @@ namespace front_biblioteca.nucleo
         public List<Prestamos> ListaPrestamos { get; private set; } = new();
         public List<Prestamos_Libros> ListaPrestamosLibros { get; private set; } = new();
         public List<Multas> ListaMultas { get; private set; } = new();
+        public List<Libros_Autores> ListaLibrosAutores { get; private set; } = new();
+        public List<Libros_Categorias> ListaLibrosCategorias { get; private set; } = new();
+        public List<Salarios> ListaSalarios { get; private set; } = new();
 
         private bool cargado;
 
@@ -64,7 +70,10 @@ namespace front_biblioteca.nucleo
             IPresentacion<Usuarios> usuarios,
             IPresentacion<Prestamos> prestamos,
             IPresentacion<Prestamos_Libros> prestamosLibros,
-            IPresentacion<Multas> multas)
+            IPresentacion<Multas> multas,
+            IPresentacion<Libros_Autores> librosAutores,
+            IPresentacion<Libros_Categorias> librosCategorias,
+            IPresentacion<Salarios> salarios)
         {
             this.personas = personas;
             this.empleados = empleados;
@@ -84,6 +93,9 @@ namespace front_biblioteca.nucleo
             this.prestamos = prestamos;
             this.prestamosLibros = prestamosLibros;
             this.multas = multas;
+            this.librosAutores = librosAutores;
+            this.librosCategorias = librosCategorias;
+            this.salarios = salarios;
         }
 
         public async Task CargarAsync()
@@ -110,7 +122,10 @@ namespace front_biblioteca.nucleo
                 CargarUsuarios(),
                 CargarPrestamos(),
                 CargarPrestamosLibros(),
-                CargarMultas()
+                CargarMultas(),
+                CargarLibrosAutores(),
+                CargarLibrosCategorias(),
+                CargarSalarios()
             };
 
             await Task.WhenAll(tareas);
@@ -141,6 +156,9 @@ namespace front_biblioteca.nucleo
         private async Task CargarPrestamos() => ListaPrestamos = await prestamos.Consultar();
         private async Task CargarPrestamosLibros() => ListaPrestamosLibros = await prestamosLibros.Consultar();
         private async Task CargarMultas() => ListaMultas = await multas.Consultar();
+        private async Task CargarLibrosAutores() => ListaLibrosAutores = await librosAutores.Consultar();
+        private async Task CargarLibrosCategorias() => ListaLibrosCategorias = await librosCategorias.Consultar();
+        private async Task CargarSalarios() => ListaSalarios = await salarios.Consultar();
 
         public string NombrePersona(int id) =>
             id == 0 ? "No asignado" : ListaPersonas.FirstOrDefault(x => x.id == id)?.nombre ?? "No asignado";
@@ -206,6 +224,54 @@ namespace front_biblioteca.nucleo
 
         public string NombreCategoria(int id) =>
             id == 0 ? "No asignado" : ListaCategorias.FirstOrDefault(x => x.id == id)?.nombre ?? "No asignado";
+
+        public string AutoresDe(int libroId)
+        {
+            var nombres = ListaLibrosAutores
+                .Where(x => x.libro == libroId)
+                .OrderBy(x => x.id)
+                .Select(x => string.IsNullOrWhiteSpace(x.tipo_participacion)
+                    ? NombreAutor(x.autor)
+                    : $"{NombreAutor(x.autor)} ({x.tipo_participacion})");
+
+            var texto = string.Join(", ", nombres);
+            return string.IsNullOrWhiteSpace(texto) ? "Sin autores" : texto;
+        }
+
+        public string CategoriasDe(int libroId)
+        {
+            var texto = string.Join(", ", ListaLibrosCategorias
+                .Where(x => x.libro == libroId)
+                .OrderBy(x => x.id)
+                .Select(x => NombreCategoria(x.categoria)));
+
+            return string.IsNullOrWhiteSpace(texto) ? "Sin categorías" : texto;
+        }
+
+        public bool LibroTieneCategoria(int libroId, int categoriaId) =>
+            ListaLibrosCategorias.Any(x => x.libro == libroId && x.categoria == categoriaId);
+
+        public string AutoresDeLibroDeEjemplar(int ejemplarId)
+        {
+            var ejemplar = ListaEjemplares.FirstOrDefault(x => x.id == ejemplarId);
+            return ejemplar is null ? "Sin autores" : AutoresDe(ejemplar.libro);
+        }
+
+        // Vigente = fecha de inicio alcanzada y fecha de fin no vencida.
+        public Salarios? SalarioVigente(int empleadoId) =>
+            ListaSalarios
+                .Where(x => x.empleado == empleadoId
+                    && (!x.fecha_inicio.HasValue || x.fecha_inicio.Value.Date <= DateTime.Today)
+                    && (!x.fecha_fin.HasValue || x.fecha_fin.Value.Date >= DateTime.Today))
+                .OrderByDescending(x => x.fecha_inicio ?? DateTime.MinValue)
+                .ThenByDescending(x => x.id)
+                .FirstOrDefault();
+
+        public string SalarioVigenteTexto(int empleadoId)
+        {
+            var salario = SalarioVigente(empleadoId);
+            return salario is null ? "Sin salario vigente" : $"{salario.valor:N0}";
+        }
 
         public string NombreSeccion(int id) =>
             id == 0 ? "No asignado" : ListaSecciones.FirstOrDefault(x => x.id == id)?.nombre ?? "No asignado";

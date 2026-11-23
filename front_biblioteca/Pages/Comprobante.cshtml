@@ -42,6 +42,7 @@
                     <th>id</th>
                     <th>Código</th>
                     <th>Libro</th>
+                    <th>Autores</th>
                     <th>Ubicación</th>
                     <th>Estado</th>
                 </tr>
@@ -53,6 +54,7 @@
                         <td>@detalle.id</td>
                         <td>@Model.Catalogos.NombreEjemplar(detalle.ejemplar)</td>
                         <td>@Model.NombreLibroDeEjemplar(detalle.ejemplar)</td>
+                        <td>@Model.Catalogos.AutoresDeLibroDeEjemplar(detalle.ejemplar)</td>
                         <td>@Model.NombreUbicacionDeEjemplar(detalle.ejemplar)</td>
                         <td>@Model.NombreEstado(detalle.estado)</td>
                     </tr>

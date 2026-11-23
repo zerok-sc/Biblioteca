@@ -47,6 +47,7 @@
             <th>Persona</th>
             <th>Cargo</th>
             <th>Fecha contratacion</th>
+            <th>Salario vigente</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -58,6 +59,7 @@
                 <td>@Model.Catalogos.NombrePersona(item.persona)</td>
                 <td>@item.cargo</td>
                 <td>@item.fecha_contratacion</td>
+                <td>@Model.Catalogos.SalarioVigenteTexto(item.id)</td>
                 <td>
                     <form method="post" style="display:inline">
                         <input type="hidden" name="id" value="@item.id" />

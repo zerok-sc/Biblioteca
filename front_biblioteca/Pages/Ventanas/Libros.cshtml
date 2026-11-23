@@ -13,6 +13,7 @@
 
 <form method="post" class="barra">
     <input name="Buscar" value="@Model.Buscar" placeholder="Buscar por codigo o nombre" />
+    <select asp-for="CategoriaFiltro" asp-items="Model.Catalogos.OpcionesCategorias"></select>
     <button class="boton" asp-page-handler="Consultar">Consultar</button>
     @if (!User.IsInRole("LECTOR"))
     {
@@ -53,6 +54,8 @@
             <th>Nombre</th>
             <th>Editorial</th>
             <th>Idioma</th>
+            <th>Autores</th>
+            <th>Categorías</th>
             <th>Disponibles</th>
             <th>Acciones</th>
         </tr>
@@ -66,6 +69,8 @@
                 <td>@item.nombre</td>
                 <td>@Model.Catalogos.NombreEditorial(item.editorial)</td>
                 <td>@Model.Catalogos.NombreIdioma(item.idioma)</td>
+                <td>@Model.Catalogos.AutoresDe(item.id)</td>
+                <td>@Model.Catalogos.CategoriasDe(item.id)</td>
                 <td>@Model.Disponibles(item.id)</td>
                 <td>
                     <form method="post" style="display:inline">
