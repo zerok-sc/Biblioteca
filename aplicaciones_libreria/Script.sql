@@ -377,8 +377,8 @@ INSERT INTO [Ejemplares] ([codigo], [estado], [libro], [ubicacion]) VALUES
 ('EJM-003', 3, 3, 3),
 ('EJM-004', 3, 4, 4),
 ('EJM-005', 5, 5, 5),
-('EJM-006', 4, 1, 1),
-('EJM-007', 4, 2, 2),
+('EJM-006', 3, 1, 1),
+('EJM-007', 3, 2, 2),
 ('EJM-008', 4, 4, 4);
 
 INSERT INTO [Prestamos]
@@ -388,14 +388,18 @@ VALUES
 ('PRES-02', 2, 2, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE')),
 ('PRES-03', 3, 1, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE')),
 ('PRES-04', 4, 3, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE')),
-('PRES-05', 5, 2, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'DEV'));
+('PRES-05', 5, 2, GETDATE(), 15, GETDATE(), DATEADD(DAY, 15, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'DEV')),
+('PRES-06', 2, 2, DATEADD(DAY, -10, GETDATE()), 7, DATEADD(DAY, -10, GETDATE()), DATEADD(DAY, -3, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'ATR')),
+('PRES-07', 3, 1, DATEADD(DAY, -12, GETDATE()), 14, DATEADD(DAY, -12, GETDATE()), DATEADD(DAY, 2, GETDATE()), (SELECT id FROM [Estados] WHERE codigo = 'PRE'));
 
 INSERT INTO [Prestamos_Libros] ([prestamo], [ejemplar], [estado], [fecha]) VALUES
 (1, 1, 3, DATEADD(DAY, 15, GETDATE())),
 (2, 2, 3, DATEADD(DAY, 15, GETDATE())),
 (3, 3, 3, DATEADD(DAY, 15, GETDATE())),
 (4, 4, 3, DATEADD(DAY, 15, GETDATE())),
-(5, 5, (SELECT id FROM [Estados] WHERE codigo = 'DEV'), DATEADD(DAY, 15, GETDATE()));
+(5, 5, (SELECT id FROM [Estados] WHERE codigo = 'DEV'), DATEADD(DAY, 15, GETDATE())),
+((SELECT id FROM [Prestamos] WHERE codigo = 'PRES-06'), 6, (SELECT id FROM [Estados] WHERE codigo = 'ATR'), DATEADD(DAY, -3, GETDATE())),
+((SELECT id FROM [Prestamos] WHERE codigo = 'PRES-07'), 7, (SELECT id FROM [Estados] WHERE codigo = 'PRE'), DATEADD(DAY, 2, GETDATE()));
 
 INSERT INTO [Multas] ([valor], [fecha], [prestamo_libro], [estado]) VALUES
 ( 5000.00, GETDATE(), 1, 1),

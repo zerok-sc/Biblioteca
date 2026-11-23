@@ -79,12 +79,12 @@
             </div>
             <div>
                 <label>Fecha de inicio</label>
-                <input type="date" name="FechaInicio"
+                <input type="date" id="FechaInicio" name="FechaInicio"
                        value="@Model.FechaInicio.ToString("yyyy-MM-dd")" />
             </div>
             <div>
                 <label>Fecha final</label>
-                <input type="date" name="FechaFin"
+                <input type="date" id="FechaFin" name="FechaFin"
                        value="@(Model.FechaFin?.ToString("yyyy-MM-dd"))" />
             </div>
             <div>
@@ -275,3 +275,40 @@ else
         </tbody>
     </table>
 }
+
+<script>
+    (function () {
+        var tiempo = document.getElementById('Tiempo');
+        var inicio = document.getElementById('FechaInicio');
+        var fin = document.getElementById('FechaFin');
+        if (!tiempo || !inicio || !fin) return;
+
+        function formatear(fecha) {
+            return fecha.getFullYear() + '-' +
+                String(fecha.getMonth() + 1).padStart(2, '0') + '-' +
+                String(fecha.getDate()).padStart(2, '0');
+        }
+
+        function actualizarFin() {
+            var dias = parseInt(tiempo.value, 10);
+            var fecha = new Date(inicio.value + 'T00:00:00');
+            if (!isNaN(dias) && dias > 0 && !isNaN(fecha.getTime())) {
+                fecha.setDate(fecha.getDate() + dias);
+                fin.value = formatear(fecha);
+            }
+        }
+
+        function actualizarTiempo() {
+            var fechaInicio = new Date(inicio.value + 'T00:00:00');
+            var fechaFin = new Date(fin.value + 'T00:00:00');
+            if (!isNaN(fechaInicio.getTime()) && !isNaN(fechaFin.getTime())) {
+                var dias = Math.round((fechaFin - fechaInicio) / 86400000);
+                if (dias > 0) tiempo.value = dias;
+            }
+        }
+
+        tiempo.addEventListener('change', actualizarFin);
+        inicio.addEventListener('change', actualizarFin);
+        fin.addEventListener('change', actualizarTiempo);
+    })();
+</script>

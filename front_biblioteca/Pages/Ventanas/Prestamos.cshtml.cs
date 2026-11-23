@@ -189,12 +189,13 @@ namespace front_biblioteca.Pages.Ventanas
                 if (inicio == default)
                     throw new InvalidOperationException("Indique la fecha de inicio.");
 
-                if (Tiempo <= 0)
-                    throw new InvalidOperationException("El tiempo debe ser mayor que cero días.");
-
                 var fin = FechaFin?.Date ?? inicio.AddDays(Tiempo);
                 if (fin < inicio)
                     throw new InvalidOperationException("La fecha final no puede ser anterior a la fecha de inicio.");
+
+                var tiempo = (fin - inicio).Days;
+                if (tiempo <= 0)
+                    throw new InvalidOperationException("El tiempo debe ser mayor que cero días.");
 
                 var seleccionados = EjemplaresSeleccionados.Distinct().ToList();
                 if (seleccionados.Count == 0)
@@ -226,7 +227,7 @@ namespace front_biblioteca.Pages.Ventanas
                     persona = persona.id,
                     empleado = empleado.id,
                     fecha = inicio,
-                    tiempo = Tiempo,
+                    tiempo = tiempo,
                     fecha_inicio = inicio,
                     fecha_fin = fin,
                     estado = estado.id
