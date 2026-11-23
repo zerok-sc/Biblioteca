@@ -240,6 +240,15 @@ disponibles.
 Al guardar, `PaginaBase<T>` valida que `nombre` y `codigo` no queden vacíos y que
 el código no esté repetido. Los avisos salen en el mismo popup de mensajes.
 
+## Auditorías
+
+Las ventanas registran automáticamente en `Auditorias` cada alta, edición y
+borrado, con entidad, id, operación (`ALTA`, `EDICION`, `BAJA`), fecha, valores
+anteriores y nuevos en JSON, usuario de la sesión y dirección IP. Las
+operaciones de préstamos también dejan registro: `PRESTAR`, `DEVOLVER`,
+`RENOVAR` y `MULTA`, además de `PAGAR` en Multas. Solo ADMIN puede consultar la
+ventana de Auditorias.
+
 ## Migraciones
 
 ```

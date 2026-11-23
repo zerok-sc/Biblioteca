@@ -64,8 +64,12 @@ namespace front_biblioteca.Pages.Ventanas
                 if (estadoPagada == 0)
                     throw new InvalidOperationException("No existe el estado Pagada en la base de datos.");
 
+                var anteriorMulta = Snapshot(multa);
+
                 multa.estado = estadoPagada;
                 await presentacion.Actualizar(multa);
+                await RegistrarAuditoriaAsync("PAGAR", anteriorMulta, multa, multa.id);
+
                 Avisar("Multa marcada como pagada.");
             }
             catch (Exception ex)

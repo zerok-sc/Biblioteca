@@ -251,6 +251,8 @@ namespace front_biblioteca.Pages.Ventanas
                     copiasPrestadas.Add(ejemplar);
                 }
 
+                await RegistrarAuditoriaAsync("PRESTAR", null, creado, creado!.id);
+
                 Avisar($"Préstamo registrado para {persona.nombre} con {disponibles.Count} ejemplar(es).");
 
                 MostrarFormulario = false;
@@ -283,6 +285,8 @@ namespace front_biblioteca.Pages.Ventanas
                 var prestamo = Catalogos.ListaPrestamos.FirstOrDefault(x => x.id == id)
                     ?? throw new InvalidOperationException("El préstamo no existe.");
 
+                var anteriorPrestamo = Snapshot(prestamo);
+
                 if (!Catalogos.PrestamoActivo(prestamo))
                     throw new InvalidOperationException("Ese préstamo ya fue devuelto.");
 
@@ -314,13 +318,15 @@ namespace front_biblioteca.Pages.Ventanas
                         if (!yaTieneMulta)
                         {
                             var valor = diasAtraso * ValorMultaPorDia;
-                            await multas.Insertar(new Multas
+                            var multaCreada = await multas.Insertar(new Multas
                             {
                                 valor = valor,
                                 fecha = DateTime.Today,
                                 prestamo_libro = detalle.id,
                                 estado = estadoActivo
                             });
+
+                            await RegistrarAuditoriaAsync("MULTA", null, multaCreada, multaCreada.id, "Multas");
 
                             multasCreadas++;
                             totalMulta += valor;
@@ -330,6 +336,7 @@ namespace front_biblioteca.Pages.Ventanas
 
                 prestamo.estado = estadoDevuelto;
                 await presentacion.Actualizar(prestamo);
+                await RegistrarAuditoriaAsync("DEVOLVER", anteriorPrestamo, prestamo, prestamo.id);
 
                 var mensaje = $"Préstamo {prestamo.codigo} devuelto correctamente.";
                 if (multasCreadas > 0)
@@ -361,6 +368,8 @@ namespace front_biblioteca.Pages.Ventanas
                 if (Catalogos.PrestamoAtrasado(prestamo))
                     throw new InvalidOperationException("No se puede renovar un préstamo atrasado. Primero registre la devolución.");
 
+                var anteriorPrestamo = Snapshot(prestamo);
+
                 prestamo.fecha_fin = prestamo.fecha_fin.Date.AddDays(DiasRenovacion);
                 prestamo.tiempo += DiasRenovacion;
                 await presentacion.Actualizar(prestamo);
@@ -370,6 +379,8 @@ namespace front_biblioteca.Pages.Ventanas
                     detalle.fecha = prestamo.fecha_fin;
                     await prestamosLibros.Actualizar(detalle);
                 }
+
+                await RegistrarAuditoriaAsync("RENOVAR", anteriorPrestamo, prestamo, prestamo.id);
 
                 Avisar($"Préstamo {prestamo.codigo} renovado hasta el {prestamo.fecha_fin:dd/MM/yyyy}.");
             }

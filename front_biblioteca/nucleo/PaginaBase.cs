@@ -1,6 +1,8 @@
+using System.Text.Json;
 using aplicaciones_libreria.entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using presentacion_libreria.interfaces;
 
 namespace front_biblioteca.nucleo
@@ -23,6 +25,55 @@ namespace front_biblioteca.nucleo
         }
 
         private bool SoloLectura => User.IsInRole("LECTOR");
+
+        private static bool EsSimple(Type tipo)
+        {
+            var baseTipo = Nullable.GetUnderlyingType(tipo) ?? tipo;
+            return baseTipo.IsPrimitive || baseTipo.IsEnum || baseTipo == typeof(string)
+                || baseTipo == typeof(decimal) || baseTipo == typeof(DateTime)
+                || baseTipo == typeof(Guid);
+        }
+
+        protected static Dictionary<string, object?>? Snapshot(object? entidad)
+        {
+            if (entidad is null)
+                return null;
+
+            return entidad.GetType().GetProperties()
+                .Where(p => EsSimple(p.PropertyType))
+                .ToDictionary(p => p.Name, p => p.GetValue(entidad));
+        }
+
+        protected async Task RegistrarAuditoriaAsync(
+            string operacion,
+            Dictionary<string, object?>? anteriores,
+            object? nuevos,
+            int entidadId,
+            string? entidad = null)
+        {
+            if (typeof(T) == typeof(Auditorias))
+                return;
+
+            try
+            {
+                var servicio = HttpContext.RequestServices.GetRequiredService<IPresentacion<Auditorias>>();
+                await servicio.Insertar(new Auditorias
+                {
+                    entidad = entidad ?? typeof(T).Name,
+                    entidad_id = entidadId,
+                    operacion = operacion,
+                    fecha = DateTime.Now,
+                    valores_anteriores = anteriores is null ? null : JsonSerializer.Serialize(anteriores),
+                    valores_nuevos = nuevos is null ? null : JsonSerializer.Serialize(Snapshot(nuevos)),
+                    nombre_usuario = User.Identity?.Name ?? "",
+                    direccion_ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? ""
+                });
+            }
+            catch
+            {
+                // La auditoría no debe impedir la operación principal.
+            }
+        }
 
         private static bool Coincide(T entidad, string texto)
         {
@@ -114,9 +165,17 @@ namespace front_biblioteca.nucleo
                     return;
                 }
 
-                Actual = Actual.id == 0
+                var esAlta = Actual.id == 0;
+                var anteriores = esAlta ? null : Snapshot(
+                    (await presentacion.Consultar()).FirstOrDefault(x => x.id == Actual.id));
+
+                Actual = esAlta
                     ? await presentacion.Insertar(Actual)
                     : await presentacion.Actualizar(Actual);
+
+                await RegistrarAuditoriaAsync(
+                    esAlta ? "ALTA" : "EDICION", anteriores, Actual, Actual.id);
+
                 Avisar("Registro guardado correctamente.");
                 MostrarFormulario = false;
             }
@@ -139,7 +198,9 @@ namespace front_biblioteca.nucleo
 
             try
             {
+                var anteriores = Snapshot((await presentacion.Consultar()).FirstOrDefault(x => x.id == id));
                 await presentacion.Borrar(new T { id = id });
+                await RegistrarAuditoriaAsync("BAJA", anteriores, null, id);
                 Avisar("Registro eliminado correctamente.");
             }
             catch (Exception ex)
