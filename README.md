@@ -4,16 +4,43 @@ WebAPI + Razor Pages + EF Core / SQL Server (.NET 10).
 
 ## Correr el proyecto
 
+Primero SQL Server y la base. Después la API y el front, en dos terminales.
+
+### Linux / macOS (bash)
+
 ```bash
-# 1. SQL Server (si el contenedor no existe, usa podman run del paso 4)
+# Si el contenedor ya existe, salta este comando
+podman run -d --name mssql -e ACCEPT_EULA=Y \
+  -e MSSQL_SA_PASSWORD='Biblioteca#2026' \
+  -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
+
+# Si ya existe, solo arráncalo
 podman start mssql
 
-# 2. Base de datos (borra y recrea biblioteca_db)
+# Carga el script (borra y recrea biblioteca_db)
 podman cp "$PWD/aplicaciones_libreria/Script.sql" mssql:/tmp/Script_actual.sql
 podman exec mssql /opt/mssql-tools18/bin/sqlcmd \
   -S localhost -U sa -P 'Biblioteca#2026' -C -b \
   -i /tmp/Script_actual.sql
 ```
+
+### Windows (PowerShell)
+
+Necesitas Podman Desktop con WSL2. Si usas Docker, cambia `podman` por `docker`.
+
+```powershell
+# Si el contenedor ya existe, salta este comando
+podman run -d --name mssql -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD='Biblioteca#2026' -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
+
+# Si ya existe, solo arráncalo
+podman start mssql
+
+# Carga el script (borra y recrea biblioteca_db)
+podman cp "$PWD\aplicaciones_libreria\Script.sql" mssql:/tmp/Script_actual.sql
+podman exec mssql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Biblioteca#2026' -C -b -i /tmp/Script_actual.sql
+```
+
+### API y front (igual en ambos)
 
 Terminal 1:
 
@@ -29,14 +56,6 @@ dotnet run --project front_biblioteca
 
 - Front: http://localhost:5131
 - Swagger: http://localhost:5130/swagger
-
-Si el contenedor no existe:
-
-```bash
-podman run -d --name mssql -e ACCEPT_EULA=Y \
-  -e MSSQL_SA_PASSWORD='Biblioteca#2026' \
-  -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
-```
 
 ## Usuarios
 
@@ -67,9 +86,6 @@ Está en `servicios_biblioteca/appsettings.json` y `aplicaciones_libreria/nucleo
 - **Borrados**: si el registro tiene datos relacionados, devuelve un mensaje claro en vez de error 500.
 - **Crear usuario**: exige elegir rol y persona; la persona se muestra con cédula para evitar confusiones.
 - **Fotos de perfil**: máximo 2 MB, se guardan en `Usuarios.foto`.
-
-Si vienes de una versión anterior, aplica `aplicaciones_libreria/ActualizarCompras.sql`
-para agregar la tabla `Compras_Libros` sin borrar la base.
 
 ## Pruebas
 
