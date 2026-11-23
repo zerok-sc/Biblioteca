@@ -118,7 +118,7 @@ namespace front_biblioteca.nucleo
             await CargarCatalogosSeguroAsync();
         }
 
-        public async Task OnPostNuevoAsync()
+        public virtual async Task OnPostNuevoAsync()
         {
             if (SoloLectura)
             {
@@ -132,7 +132,7 @@ namespace front_biblioteca.nucleo
             await CargarAsync();
         }
 
-        public async Task OnPostEditarAsync(int id)
+        public virtual async Task OnPostEditarAsync(int id)
         {
             if (SoloLectura)
             {
@@ -146,7 +146,7 @@ namespace front_biblioteca.nucleo
             MostrarFormulario = true;
         }
 
-        public async Task OnPostGuardarAsync()
+        public virtual async Task OnPostGuardarAsync()
         {
             if (SoloLectura)
             {
@@ -187,7 +187,7 @@ namespace front_biblioteca.nucleo
             await CargarAsync();
         }
 
-        public async Task OnPostBorrarAsync(int id)
+        public virtual async Task OnPostBorrarAsync(int id)
         {
             if (SoloLectura)
             {

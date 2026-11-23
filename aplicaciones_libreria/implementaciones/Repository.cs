@@ -55,7 +55,17 @@ namespace aplicaciones_libreria.implementaciones
             }
 
             conexion.Set<T>().Remove(entidad);
-            await conexion.SaveChangesAsync(cancelacion);
+            try
+            {
+                await conexion.SaveChangesAsync(cancelacion);
+            }
+            catch (DbUpdateException)
+            {
+                conexion.Entry(entidad).State = EntityState.Unchanged;
+                throw new InvalidOperationException(
+                    "No se puede borrar: el registro tiene datos relacionados.");
+            }
+
             return true;
         }
 

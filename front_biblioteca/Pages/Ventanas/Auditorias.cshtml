@@ -14,32 +14,9 @@
 <form method="post" class="barra">
     <input name="Buscar" value="@Model.Buscar" placeholder="Buscar por codigo o nombre" />
     <button class="boton" asp-page-handler="Consultar">Consultar</button>
-    @if (!User.IsInRole("LECTOR"))
-    {
-        <button class="boton" asp-page-handler="Nuevo">Nuevo registro</button>
-    }
 </form>
 
-@if (Model.MostrarFormulario)
-{
-    <form method="post">
-        <input type="hidden" asp-for="Actual.id" />
-        <div class="campos">
-            <div><label>Entidad</label><input asp-for="Actual.entidad" /></div>
-            <div><label>Entidad id</label><input asp-for="Actual.entidad_id" /></div>
-            <div><label>Operacion</label><input asp-for="Actual.operacion" /></div>
-            <div><label>Fecha</label><input asp-for="Actual.fecha" /></div>
-            <div><label>Valores anteriores</label><input asp-for="Actual.valores_anteriores" /></div>
-            <div><label>Valores nuevos</label><input asp-for="Actual.valores_nuevos" /></div>
-            <div><label>Nombre usuario</label><input asp-for="Actual.nombre_usuario" /></div>
-            <div><label>Direccion ip</label><input asp-for="Actual.direccion_ip" /></div>
-        </div>
-        @if (!User.IsInRole("LECTOR"))
-        {
-            <button class="boton" asp-page-handler="Guardar">Guardar</button>
-        }
-    </form>
-}
+<p class="ayuda">Las auditorías son solo lectura: no se pueden crear, editar ni borrar registros.</p>
 
 <table>
     <thead>
@@ -53,7 +30,6 @@
             <th>Valores nuevos</th>
             <th>Nombre usuario</th>
             <th>Direccion ip</th>
-            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -69,16 +45,6 @@
                 <td>@item.valores_nuevos</td>
                 <td>@item.nombre_usuario</td>
                 <td>@item.direccion_ip</td>
-                <td>
-                    <form method="post" style="display:inline">
-                        <input type="hidden" name="id" value="@item.id" />
-                        @if (!User.IsInRole("LECTOR"))
-                        {
-                            <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
-                            <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
-                        }
-                    </form>
-                </td>
             </tr>
         }
     </tbody>

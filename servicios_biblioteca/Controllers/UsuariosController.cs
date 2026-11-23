@@ -26,19 +26,31 @@ namespace servicios_biblioteca.Controllers
                 .Include(x => x._persona)
                 .FirstOrDefaultAsync(x => x.nombre_usuario == pedido.usuario);
 
-            if (usuario is null || !usuario.activo)
+            if (usuario is null)
                 return Unauthorized("Usuario o clave incorrectos.");
+
+            if (!usuario.activo)
+            {
+                await RegistrarSesionAsync(usuario.id, pedido, false, "Usuario inactivo");
+                return Unauthorized("Usuario o clave incorrectos.");
+            }
 
             var calculado = ClaveSeguridad.Hash(pedido.clave, usuario.password_salt);
             if (!ClaveSeguridad.Coinciden(usuario.password_hash, calculado))
+            {
+                await RegistrarSesionAsync(usuario.id, pedido, false, "Clave incorrecta");
                 return Unauthorized("Usuario o clave incorrectos.");
+            }
 
             await conexion.Usuarios!
                 .Where(x => x.id == usuario.id)
                 .ExecuteUpdateAsync(x => x.SetProperty(u => u.ultimo_acceso, DateTime.Now));
 
+            var sesionId = await RegistrarSesionAsync(usuario.id, pedido, true, null);
+
             return new DatosSesion
             {
+                sesion_id = sesionId,
                 id = usuario.id,
                 nombre_usuario = usuario.nombre_usuario ?? "",
                 correo = usuario.correo ?? "",
@@ -51,6 +63,56 @@ namespace servicios_biblioteca.Controllers
                     : null,
                 imagen_tipo = usuario.foto_tipo
             };
+        }
+
+        private async Task<int> RegistrarSesionAsync(
+            int usuarioId,
+            PedidoLogin pedido,
+            bool exitoso,
+            string? motivo)
+        {
+            var sesion = new Sesiones
+            {
+                usuario = usuarioId,
+                fecha_inicio = DateTime.Now,
+                direccion_ip = Limitar(pedido.direccion_ip, 50),
+                agente_usuario = Limitar(pedido.agente_usuario, 400),
+                exitoso = exitoso,
+                motivo_fallo = Limitar(motivo, 200)
+            };
+
+            conexion.Sesiones!.Add(sesion);
+            await conexion.SaveChangesAsync();
+            return sesion.id;
+        }
+
+        private static string? Limitar(string? texto, int maximo)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+                return null;
+
+            var limpio = texto.Trim();
+            return limpio.Length <= maximo ? limpio : limpio[..maximo];
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<RespuestaSimple>> CerrarSesion(
+            [FromBody] PedidoCerrarSesion pedido)
+        {
+            if (pedido.sesion_id <= 0)
+                return BadRequest(new RespuestaSimple { mensaje = "Sesión no válida." });
+
+            var sesion = await conexion.Sesiones!
+                .AsTracking()
+                .FirstOrDefaultAsync(x => x.id == pedido.sesion_id);
+
+            if (sesion is null)
+                return NotFound(new RespuestaSimple { mensaje = "La sesión no existe." });
+
+            sesion.fecha_fin = DateTime.Now;
+            await conexion.SaveChangesAsync();
+
+            return new RespuestaSimple { mensaje = "Sesión cerrada." };
         }
 
         [HttpPost]

@@ -40,7 +40,11 @@ namespace front_biblioteca.Pages
 
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
-            var datos = await autenticacion.IniciarSesion(Usuario, Clave);
+            var datos = await autenticacion.IniciarSesion(
+                Usuario,
+                Clave,
+                HttpContext.Connection.RemoteIpAddress?.ToString(),
+                Request.Headers.UserAgent.ToString());
             if (datos is null)
             {
                 Error = "Usuario o clave incorrectos.";
@@ -57,7 +61,8 @@ namespace front_biblioteca.Pages
                 new("RolNombre", datos.rol_nombre),
                 new("PersonaNombre", datos.persona_nombre),
                 new("PersonaId", datos.persona_id.ToString()),
-                new("ImagenTipo", datos.imagen_tipo ?? "image/png")
+                new("ImagenTipo", datos.imagen_tipo ?? "image/png"),
+                new("SesionId", datos.sesion_id.ToString())
             };
 
             var identidad = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

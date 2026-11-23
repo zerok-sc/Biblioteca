@@ -1,5 +1,6 @@
 using aplicaciones_libreria.entidades;
 using aplicaciones_libreria.interfaces;
+using aplicaciones_libreria.nucleo;
 using Microsoft.AspNetCore.Mvc;
 
 namespace servicios_biblioteca.Controllers
@@ -46,13 +47,23 @@ namespace servicios_biblioteca.Controllers
         }
 
         [HttpPost]
-        public async Task<T> Borrar([FromBody] T entidad)
+        public async Task<ActionResult<T>> Borrar([FromBody] T entidad)
         {
-            var eliminado = await repositorio.EliminarAsync(entidad.id);
-            if (!eliminado)
-                throw new KeyNotFoundException($"No existe el registro con id {entidad.id}.");
+            try
+            {
+                var eliminado = await repositorio.EliminarAsync(entidad.id);
+                if (!eliminado)
+                    return NotFound(new RespuestaSimple
+                    {
+                        mensaje = $"No existe el registro con id {entidad.id}."
+                    });
 
-            return entidad;
+                return entidad;
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new RespuestaSimple { mensaje = ex.Message });
+            }
         }
     }
 }

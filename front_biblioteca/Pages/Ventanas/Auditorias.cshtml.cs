@@ -5,11 +5,37 @@ using presentacion_libreria.interfaces;
 
 namespace front_biblioteca.Pages.Ventanas
 {
-[Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "ADMIN")]
     public class AuditoriasModel : PaginaBase<Auditorias>
     {
-        public AuditoriasModel(IPresentacion<Auditorias> presentacion, Catalogos catalogos) : base(presentacion, catalogos)
+        public AuditoriasModel(
+            IPresentacion<Auditorias> presentacion,
+            Catalogos catalogos) : base(presentacion, catalogos)
         {
+        }
+
+        public override async Task OnPostNuevoAsync()
+        {
+            Avisar("Auditorías es solo lectura.");
+            await CargarAsync();
+        }
+
+        public override async Task OnPostEditarAsync(int id)
+        {
+            Avisar("Auditorías es solo lectura.");
+            await CargarAsync();
+        }
+
+        public override async Task OnPostGuardarAsync()
+        {
+            Avisar("Auditorías es solo lectura.");
+            await CargarAsync();
+        }
+
+        public override async Task OnPostBorrarAsync(int id)
+        {
+            Avisar("Auditorías es solo lectura.");
+            await CargarAsync();
         }
     }
 }

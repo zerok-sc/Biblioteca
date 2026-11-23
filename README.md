@@ -62,7 +62,9 @@ Está en `servicios_biblioteca/appsettings.json` y `aplicaciones_libreria/nucleo
 - **Préstamos**: registrar varias copias, devolver, renovar, comprobante imprimible y exportar CSV.
 - **Multas**: 2.000 por día de atraso, se generan al devolver; botón **Pagar**.
 - **Compras**: elige libro, cantidad y costo unitario; el total se calcula solo y crea los ejemplares en `DIS`. Una compra con libros no se puede borrar.
-- **Auditorías**: solo ADMIN. Registra altas, ediciones, borrados, `PRESTAR`, `DEVOLVER`, `RENOVAR`, `MULTA`, `PAGAR` y `COMPRA`, con usuario, IP y valores anteriores/nuevos.
+- **Auditorías**: solo ADMIN y solo lectura. Registra altas, ediciones, borrados, `PRESTAR`, `DEVOLVER`, `RENOVAR`, `MULTA`, `PAGAR` y `COMPRA`, con usuario, IP y valores anteriores/nuevos.
+- **Sesiones**: ADMIN ve ingresos, intentos fallidos y cierres con IP, agente y motivo.
+- **Borrados**: si el registro tiene datos relacionados, devuelve un mensaje claro en vez de error 500.
 - **Fotos de perfil**: máximo 2 MB, se guardan en `Usuarios.foto`.
 
 Si vienes de una versión anterior, aplica `aplicaciones_libreria/ActualizarCompras.sql`

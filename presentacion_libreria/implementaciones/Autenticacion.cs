@@ -13,18 +13,35 @@ namespace presentacion_libreria.implementaciones
             this.comunicaciones = comunicaciones;
         }
 
-        public async Task<DatosSesion?> IniciarSesion(string usuario, string clave)
+        public async Task<DatosSesion?> IniciarSesion(
+            string usuario,
+            string clave,
+            string? direccionIp = null,
+            string? agenteUsuario = null)
         {
             try
             {
                 return await comunicaciones.Ejecutar<DatosSesion?>(
                     "Usuarios/Login",
-                    new PedidoLogin { usuario = usuario, clave = clave });
+                    new PedidoLogin
+                    {
+                        usuario = usuario,
+                        clave = clave,
+                        direccion_ip = direccionIp,
+                        agente_usuario = agenteUsuario
+                    });
             }
             catch (ApiExcepcion ex) when (ex.Codigo == 401)
             {
                 return null;
             }
+        }
+
+        public Task CerrarSesion(int sesionId)
+        {
+            return comunicaciones.Ejecutar<RespuestaSimple>(
+                "Usuarios/CerrarSesion",
+                new PedidoCerrarSesion { sesion_id = sesionId });
         }
 
         public async Task<string> CrearUsuario(PedidoCrearUsuario pedido)

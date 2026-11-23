@@ -4,6 +4,13 @@ namespace aplicaciones_libreria.nucleo
     {
         public string usuario { get; set; } = "";
         public string clave { get; set; } = "";
+        public string? direccion_ip { get; set; }
+        public string? agente_usuario { get; set; }
+    }
+
+    public class PedidoCerrarSesion
+    {
+        public int sesion_id { get; set; }
     }
 
     public class PedidoFoto
@@ -34,5 +41,6 @@ namespace aplicaciones_libreria.nucleo
         public int persona_id { get; set; }
         public string? imagen { get; set; }
         public string? imagen_tipo { get; set; }
+        public int sesion_id { get; set; }
     }
 }
