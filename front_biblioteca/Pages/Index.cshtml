@@ -62,7 +62,7 @@
                     <th>Ejemplares</th>
                     <th>Fecha final</th>
                     <th>Atraso</th>
-                    <th>Acciones</th>
+                    @if (!User.IsInRole(Codigos.RolLector)) { <th>Acciones</th> }
                 </tr>
             </thead>
             <tbody>
@@ -74,10 +74,13 @@
                         <td>@Model.Ejemplares(item)</td>
                         <td>@item.fecha_fin.ToString("dd/MM/yyyy")</td>
                         <td><span class="etiqueta etiqueta-atrasado">@Model.Situacion(item)</span></td>
-                        <td>
-                            <a class="boton boton-claro" asp-page="/Comprobante"
-                               asp-route-tipo="prestamo" asp-route-id="@item.id">Comprobante</a>
-                        </td>
+                        @if (!User.IsInRole(Codigos.RolLector))
+                        {
+                            <td>
+                                <a class="boton boton-claro" asp-page="/Comprobante"
+                                   asp-route-tipo="prestamo" asp-route-id="@item.id">Comprobante</a>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>
@@ -99,7 +102,7 @@
                     <th>Ejemplares</th>
                     <th>Fecha final</th>
                     <th>Situación</th>
-                    <th>Acciones</th>
+                    @if (!User.IsInRole(Codigos.RolLector)) { <th>Acciones</th> }
                 </tr>
             </thead>
             <tbody>
@@ -111,10 +114,13 @@
                         <td>@Model.Ejemplares(item)</td>
                         <td>@item.fecha_fin.ToString("dd/MM/yyyy")</td>
                         <td><span class="etiqueta @Model.ClaseSituacion(item)">@Model.Situacion(item)</span></td>
-                        <td>
-                            <a class="boton boton-claro" asp-page="/Comprobante"
-                               asp-route-tipo="prestamo" asp-route-id="@item.id">Comprobante</a>
-                        </td>
+                        @if (!User.IsInRole(Codigos.RolLector))
+                        {
+                            <td>
+                                <a class="boton boton-claro" asp-page="/Comprobante"
+                                   asp-route-tipo="prestamo" asp-route-id="@item.id">Comprobante</a>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>

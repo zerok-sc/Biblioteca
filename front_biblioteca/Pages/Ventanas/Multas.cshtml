@@ -57,7 +57,7 @@
             <th>Fecha</th>
             <th>Prestamo libro</th>
             <th>Estado</th>
-            <th>Acciones</th>
+            @if (!User.IsInRole(Codigos.RolLector)) { <th>Acciones</th> }
         </tr>
     </thead>
     <tbody>
@@ -72,33 +72,36 @@
                 <td>@item.fecha.ToString("dd/MM/yyyy")</td>
                 <td>@Model.Catalogos.NombrePrestamoLibro(item.prestamo_libro)</td>
                 <td>@Model.Catalogos.NombreEstado(item.estado)</td>
-                <td>
-                    <div class="acciones">
-                        <a class="boton boton-claro" asp-page="/Comprobante"
-                           asp-route-tipo="multa" asp-route-id="@item.id">Factura / PDF</a>
-
-                        @if (!User.IsInRole(Codigos.RolLector))
-                        {
-                            <form method="post" style="display:inline">
-                                <input type="hidden" name="id" value="@item.id" />
-                                <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
-                            </form>
-
-                            @if (!Model.EsPagada(item))
+                @if (!User.IsInRole(Codigos.RolLector))
+                {
+                    <td>
+                        <div class="acciones">
+                            <a class="boton boton-claro" asp-page="/Comprobante"
+                               asp-route-tipo="multa" asp-route-id="@item.id">Factura / PDF</a>
+    
+                            @if (!User.IsInRole(Codigos.RolLector))
                             {
                                 <form method="post" style="display:inline">
                                     <input type="hidden" name="id" value="@item.id" />
-                                    <button class="boton" asp-page-handler="Pagar">Marcar pagada</button>
+                                    <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
+                                </form>
+    
+                                @if (!Model.EsPagada(item))
+                                {
+                                    <form method="post" style="display:inline">
+                                        <input type="hidden" name="id" value="@item.id" />
+                                        <button class="boton" asp-page-handler="Pagar">Marcar pagada</button>
+                                    </form>
+                                }
+    
+                                <form method="post" style="display:inline">
+                                    <input type="hidden" name="id" value="@item.id" />
+                                    <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
                                 </form>
                             }
-
-                            <form method="post" style="display:inline">
-                                <input type="hidden" name="id" value="@item.id" />
-                                <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
-                            </form>
-                        }
-                    </div>
-                </td>
+                        </div>
+                    </td>
+                }
             </tr>
         }
     </tbody>

@@ -49,7 +49,7 @@
             <th>Descripcion</th>
             <th>Ubicacion</th>
             <th>Estado</th>
-            <th>Acciones</th>
+            @if (!User.IsInRole(Codigos.RolLector)) { <th>Acciones</th> }
         </tr>
     </thead>
     <tbody>
@@ -61,16 +61,19 @@
                 <td>@item.descripcion</td>
                 <td>@item.ubicacion</td>
                 <td>@Model.Catalogos.NombreEstado(item.estado)</td>
-                <td>
-                    <form method="post" style="display:inline">
-                        <input type="hidden" name="id" value="@item.id" />
-                        @if (!User.IsInRole(Codigos.RolLector))
-                        {
-                            <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
-                            <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
-                        }
-                    </form>
-                </td>
+                @if (!User.IsInRole(Codigos.RolLector))
+                {
+                    <td>
+                        <form method="post" style="display:inline">
+                            <input type="hidden" name="id" value="@item.id" />
+                            @if (!User.IsInRole(Codigos.RolLector))
+                            {
+                                <button class="boton boton-claro" asp-page-handler="Editar">Editar</button>
+                                <button class="boton boton-peligro" asp-page-handler="Borrar">Borrar</button>
+                            }
+                        </form>
+                    </td>
+                }
             </tr>
         }
     </tbody>

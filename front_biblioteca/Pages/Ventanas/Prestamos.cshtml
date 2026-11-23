@@ -48,12 +48,15 @@
                     <td>@persona.nombre</td>
                     <td>@persona.cedula</td>
                     <td>@persona.telefono</td>
-                    <td>
-                        <form method="post" style="display:inline">
-                            <input type="hidden" name="personaId" value="@persona.id" />
-                            <button class="boton" asp-page-handler="Seleccionar">Seleccionar</button>
-                        </form>
-                    </td>
+                    @if (!User.IsInRole(Codigos.RolLector))
+                    {
+                        <td>
+                            <form method="post" style="display:inline">
+                                <input type="hidden" name="personaId" value="@persona.id" />
+                                <button class="boton" asp-page-handler="Seleccionar">Seleccionar</button>
+                            </form>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>
@@ -220,7 +223,7 @@ else
                 <th>Tiempo</th>
                 <th>Estado</th>
                 <th>Situación</th>
-                <th>Acciones</th>
+                @if (!User.IsInRole(Codigos.RolLector)) { <th>Acciones</th> }
             </tr>
         </thead>
         <tbody>
@@ -237,39 +240,42 @@ else
                     <td>@item.tiempo días</td>
                     <td>@Model.EstadoVisible(item)</td>
                     <td><span class="etiqueta @Model.ClaseSituacion(item)">@Model.Situacion(item)</span></td>
-                    <td>
-                        <div class="acciones">
-                            <a class="boton boton-claro" asp-page="/Comprobante"
-                               asp-route-tipo="prestamo" asp-route-id="@item.id">Comprobante</a>
-
-                            @if (Model.Catalogos.PrestamoActivo(item))
-                            {
-                                <form method="post" style="display:inline">
-                                    <input type="hidden" name="id" value="@item.id" />
-                                    <input type="hidden" name="FiltroEstado" value="@Model.FiltroEstadoActual" />
-                                    <input type="hidden" name="BuscarPrestamo" value="@Model.BuscarPrestamo" />
-                                    <button class="boton" asp-page-handler="Devolver">Devolver</button>
-                                </form>
-
-                                @if (!Model.Catalogos.PrestamoAtrasado(item))
+                    @if (!User.IsInRole(Codigos.RolLector))
+                    {
+                        <td>
+                            <div class="acciones">
+                                <a class="boton boton-claro" asp-page="/Comprobante"
+                                   asp-route-tipo="prestamo" asp-route-id="@item.id">Comprobante</a>
+    
+                                @if (Model.Catalogos.PrestamoActivo(item))
                                 {
                                     <form method="post" style="display:inline">
                                         <input type="hidden" name="id" value="@item.id" />
                                         <input type="hidden" name="FiltroEstado" value="@Model.FiltroEstadoActual" />
                                         <input type="hidden" name="BuscarPrestamo" value="@Model.BuscarPrestamo" />
-                                        <button class="boton boton-claro" asp-page-handler="Renovar">Renovar 15 días</button>
+                                        <button class="boton" asp-page-handler="Devolver">Devolver</button>
                                     </form>
+    
+                                    @if (!Model.Catalogos.PrestamoAtrasado(item))
+                                    {
+                                        <form method="post" style="display:inline">
+                                            <input type="hidden" name="id" value="@item.id" />
+                                            <input type="hidden" name="FiltroEstado" value="@Model.FiltroEstadoActual" />
+                                            <input type="hidden" name="BuscarPrestamo" value="@Model.BuscarPrestamo" />
+                                            <button class="boton boton-claro" asp-page-handler="Renovar">Renovar 15 días</button>
+                                        </form>
+                                    }
                                 }
-                            }
-
-                            <form method="post" style="display:inline">
-                                <input type="hidden" name="id" value="@item.id" />
-                                <input type="hidden" name="FiltroEstado" value="@Model.FiltroEstadoActual" />
-                                <input type="hidden" name="BuscarPrestamo" value="@Model.BuscarPrestamo" />
-                                <button class="boton boton-peligro" asp-page-handler="BorrarPrestamo">Borrar</button>
-                            </form>
-                        </div>
-                    </td>
+    
+                                <form method="post" style="display:inline">
+                                    <input type="hidden" name="id" value="@item.id" />
+                                    <input type="hidden" name="FiltroEstado" value="@Model.FiltroEstadoActual" />
+                                    <input type="hidden" name="BuscarPrestamo" value="@Model.BuscarPrestamo" />
+                                    <button class="boton boton-peligro" asp-page-handler="BorrarPrestamo">Borrar</button>
+                                </form>
+                            </div>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>
