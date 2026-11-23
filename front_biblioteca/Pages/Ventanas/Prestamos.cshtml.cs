@@ -393,6 +393,68 @@ namespace front_biblioteca.Pages.Ventanas
             return Page();
         }
 
+        public async Task<IActionResult> OnPostBorrarPrestamoAsync(int id)
+        {
+            await base.OnGetAsync();
+
+            if (User.IsInRole("LECTOR"))
+            {
+                Avisar("El rol Lector solo puede consultar.");
+                await RecargarAsync();
+                return Page();
+            }
+
+            try
+            {
+                var prestamo = Catalogos.ListaPrestamos.FirstOrDefault(x => x.id == id)
+                    ?? throw new InvalidOperationException("El préstamo no existe.");
+
+                var anteriores = Snapshot(prestamo);
+                var detalles = Catalogos.PrestamosLibrosDe(prestamo.id);
+                var idsDetalles = detalles.Select(x => x.id).ToHashSet();
+                var multas = Catalogos.ListaMultas
+                    .Where(x => idsDetalles.Contains(x.prestamo_libro))
+                    .ToList();
+
+                foreach (var multa in multas)
+                    await this.multas.Borrar(new Multas { id = multa.id });
+
+                var estadoDisponible = Catalogos.IdEstado("DIS");
+                foreach (var detalle in detalles)
+                {
+                    if (estadoDisponible > 0)
+                    {
+                        var copia = Catalogos.ListaEjemplares
+                            .FirstOrDefault(x => x.id == detalle.ejemplar);
+                        if (copia is not null)
+                        {
+                            copia.estado = estadoDisponible;
+                            await ejemplares.Actualizar(copia);
+                        }
+                    }
+
+                    await prestamosLibros.Borrar(new Prestamos_Libros { id = detalle.id });
+                }
+
+                await presentacion.Borrar(new Prestamos { id = id });
+                await RegistrarAuditoriaAsync("BAJA", anteriores, null, id);
+
+                var mensaje = $"Préstamo {prestamo.codigo} eliminado.";
+                if (detalles.Count > 0)
+                    mensaje += $" Se liberaron {detalles.Count} ejemplar(es).";
+                if (multas.Count > 0)
+                    mensaje += $" Se borraron {multas.Count} multa(s).";
+                Avisar(mensaje);
+            }
+            catch (Exception ex)
+            {
+                LogConversor.Log(ex, ViewData);
+            }
+
+            await RecargarAsync();
+            return Page();
+        }
+
         public async Task<IActionResult> OnPostFiltrarPrestamosAsync()
         {
             await base.OnGetAsync();
